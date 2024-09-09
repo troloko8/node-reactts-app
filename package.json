@@ -4,6 +4,8 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@tanstack/react-query": "^5.55.4",
+        "@tanstack/react-query-devtools": "^5.55.4",
         "@testing-library/jest-dom": "^5.17.0",
         "@testing-library/react": "^13.4.0",
         "@testing-library/user-event": "^13.5.0",
@@ -12,6 +14,7 @@
         "@types/react": "^18.3.5",
         "@types/react-dom": "^18.3.0",
         "axios": "^1.7.7",
+        "cors": "^2.8.5",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "react-scripts": "5.0.1",
@@ -19,17 +22,12 @@
         "web-vitals": "^2.1.4"
     },
     "scripts": {
-        "startOld": "react-scripts start",
+        "start": "react-scripts start",
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
-
-        "start": "node server.js",
-        "server": "node --watch server.js",
-        "client": "npm start --prefix client",
-
-        "frontend": "npm start --prefix frontend",
-        "backend": "npm run start --prefix backend",
+        "server": "node ../../NodeJSUdemy/server.js",
+        "client": "npm start --prefix frontend",
         "dev": "concurrently \"npm run frontend\" \"npm run backend\""
     },
     "eslintConfig": {
