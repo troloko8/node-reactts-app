@@ -24,7 +24,15 @@
         "@typescript-eslint"
     ],
     "rules": {
-        // Define your custom ESLint rules here, if needed.
+        "prettier/prettier": [
+            "error",
+            {
+                "singleQuote": true,
+                "semi": false,
+                "tabWidth": 4,
+                "bracketSpacing": true
+            }
+        ]
     },
     "settings": {
         "react": {
