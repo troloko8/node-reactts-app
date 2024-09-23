@@ -1,7 +1,9 @@
 import React from 'react'
 import AccountComponent from './account/AccountComponent.js'
 
-interface Props {}
+interface Props {
+    some?: string
+}
 
 const HeaderComponent: React.FC<Props> = (props) => {
     return (

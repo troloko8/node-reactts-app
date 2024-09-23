@@ -1,0 +1,101 @@
+.card {
+    border-radius: 3px;
+    -webkit-box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    -webkit-transition: 0.3s all;
+    transition: 0.3s all;
+    /* -webkit-backface-visibility: hidden; */
+    /* backface-visibility: hidden; */
+    /* display: -webkit-box; */
+    /* display: -ms-flexbox; */
+    display: flex;
+    /* -webkit-box-orient: vertical; */
+    /* -webkit-box-direction: normal; */
+    /* -ms-flex-direction: column; */
+    flex-direction: column;
+}
+
+.card__header {
+    position: relative;
+}
+
+.card__picture {
+    /* webkit-clip-path: polygon(0 0, 100% 0%, 100% 83%, 0% 98%); */
+    clip-path: polygon(0 0, 100% 0%, 100% 83%, 0% 98%);
+    height: 350px;
+    width: 100%;
+    /* background: url('https://natureconservancy-h.assetsadobe.com/is/image/content/dam/tnc/nature/en/photos/w/o/WOPA160517_D056-resized.jpg?crop=864%2C0%2C1728%2C2304&wid=600&hei=800&scl=2.88'); */
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.card__heading {
+    font-size: 50px;
+    text-align: right;
+    position: absolute;
+    bottom: 16px;
+    color:#fff;
+    right: 32px;
+    width: 70%;
+    z-index: 2;
+    line-height: 1;
+    background-image:linear-gradient(to bottom right, rgba(125, 213, 111, 0.85), rgba(40, 180, 135, 0.85));
+}
+
+.card__heading span {
+    padding: 16px 24px;
+    line-height: 1;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    background-image: -webkit-gradient(linear, left top, right bottom, from(rgba(125, 213, 111, 0.85)), to(rgba(40, 180, 135, 0.85)));
+    background-image: linear-gradient(to bottom right, rgba(125, 213, 111, 0.85), rgba(40, 180, 135, 0.85));
+}
+
+.card__details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-row-gap: 1.75rem;
+    grid-column-gap: 2rem;
+    padding: 2.5rem 3rem;
+}
+
+.card__sub_heading {
+    font-size: 20px;
+    text-transform: uppercase;
+    font-weight: 700;
+    grid-column: 1 / -1;
+}
+
+.card_summary {
+    grid-column: 1 / -1;
+    font-size: 1.5rem;
+    font-style: italic;
+}
+
+.card__additional_data {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-row-gap: 1.75rem;
+    grid-column-gap: 2rem;
+}
+
+.card__add_data {
+    font-size: 1.3rem;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+.card__icon {
+    height: 2rem;
+    width: 2rem;
+    fill: #55c57a;
+}
+
+.card__icon svg{
+    margin-right: 0.7rem;
+}

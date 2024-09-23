@@ -1,9 +1,10 @@
 import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import logo from './logo.svg'
 import './App.css'
-import axios from 'axios'
+import './normalize.css'
+import apiService from './services/APIService'
+import ToursComponent from './components/main//tours/ToursComponent'
 
 // const fetchData = async () => {
 //     const { data } = await axios.get('/api/data')
@@ -16,7 +17,11 @@ interface MyDataType {
 }
 
 const fetchData = async (): Promise<MyDataType[]> => {
-    const { data } = await axios.get('https://api.example.com/data')
+    // const { data } = await axios.get('http://localhost:3001/api/v1/tours')
+    const { data } = await apiService.get<MyDataType[]>('tours', {
+        // params: { page: 1, limit: 2 },
+    })
+
     return data
 }
 
@@ -33,24 +38,31 @@ function App() {
     if (error) return <p>Error loading data</p>
 
     console.log(data)
+    // TODO
+    // front for tourRow and TourFull
+    //TODO create LoaderComponent for uploading new items
     return (
-        <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <p>
-                    Edit <code>src/App.tsx</code> and save to reload.
-                </p>
-                <a
-                    className="App-link"
-                    href="https://reactjs.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Learn React
-                </a>
-            </header>
+        <div>
+            <ToursComponent />
         </div>
     )
+
+    // <div className="App">
+    //     <header className="App-header">
+    //         <img src={logo} className="App-logo" alt="logo" />
+    //         <p>
+    //             Edit <code>src/App.tsx</code> and save to reload.
+    //         </p>
+    //         <a
+    //             className="App-link"
+    //             href="https://reactjs.org"
+    //             target="_blank"
+    //             rel="noopener noreferrer"
+    //         >
+    //             Learn React
+    //         </a>
+    //     </header>
+    // </div>
 }
 
 export default App
