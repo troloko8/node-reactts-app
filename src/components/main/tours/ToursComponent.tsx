@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import TourItemCompont from './tour/tourItem/TourItemCompont'
 import apiService from '../../../services/APIService'
+import styles from './ToursComponent.module.css'
 
 interface Props {}
 
@@ -26,7 +27,7 @@ const ToursComponent: React.FC<Props> = (props) => {
     if (error) return <p>Error loading data</p>
 
     return (
-        <div>
+        <div className={styles.card_container}>
             {data?.map((tour, key) => (
                 <TourItemCompont {...tour} key={key} />
             )) ?? 'No any items ...'}

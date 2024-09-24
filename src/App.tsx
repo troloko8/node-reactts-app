@@ -37,12 +37,12 @@ function App() {
     if (isLoading) return <p>Loading...</p>
     if (error) return <p>Error loading data</p>
 
-    console.log(data)
+    // console.log(data)
     // TODO
     // front for tourRow and TourFull
     //TODO create LoaderComponent for uploading new items
     return (
-        <div>
+        <div className="main">
             <ToursComponent />
         </div>
     )

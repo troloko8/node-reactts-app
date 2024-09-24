@@ -134,3 +134,73 @@ summary {
 [hidden] {
   display: none;
 }
+
+/* Universal Reset */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Ensure full height for the document */
+html, body {
+  height: 100%;
+  line-height: 1.5;
+}
+
+/* Set basic text styles */
+body {
+  font-family: sans-serif;
+  color: #000;
+  background-color: #fff;
+}
+
+/* Remove default list styles */
+ul, ol {
+  list-style: none;
+}
+
+/* Reset links */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Remove default button and form styles */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+/* Media elements */
+img,
+audio,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Blockquote */
+blockquote, figure {
+  margin: 0;
+}
+
+/* Disable default HTML5 display properties */
+article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section {
+  display: block;
+}
