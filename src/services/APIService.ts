@@ -14,15 +14,15 @@ interface ApiResponse<T> {
     status: string
 }
 
-class ApiService {
+export class ApiService {
     private api: AxiosInstance
     page: number = 0
     limit: number = 10
     baseURL = 'http://localhost:3001/api/v1/'
 
-    constructor(baseURL: string) {
+    constructor() {
         this.api = axios.create({
-            baseURL,
+            baseURL: this.baseURL,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -92,5 +92,5 @@ class ApiService {
 }
 
 // Example: Export a singleton instance of ApiService
-const apiService = new ApiService('http://localhost:3001/api/v1/')
-export default apiService
+// const apiService = new ApiService('http://localhost:3001/api/v1/')
+// export default apiService

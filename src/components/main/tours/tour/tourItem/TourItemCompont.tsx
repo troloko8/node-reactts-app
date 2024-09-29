@@ -1,6 +1,7 @@
 import React from 'react'
 
 import styles from './TourItemCompont.module.css'
+import { useNavigate } from 'react-router-dom'
 
 interface Props extends Tour {
     imgPath?: string
@@ -49,6 +50,14 @@ const bgGradient =
     'linear-gradient(to right bottom, rgba(125, 213, 111, 0.7), rgba(40, 180, 135, 0.7))'
 
 const TourItemCompont: React.FC<Props> = (props) => {
+    const navigate = useNavigate()
+
+    const handleTourClick = (tour: Tour) => {
+        // Navigate and pass the tour as state
+        navigate(`/tours/${tour.id}`, { state: { tour } })
+        // navigate(`/tours/${tour.id}`)
+    }
+
     const cardStyle = {
         backgroundImage: `
             ${bgGradient},
@@ -90,12 +99,13 @@ const TourItemCompont: React.FC<Props> = (props) => {
                     </span>
                     &nbsp;
                     <span className={styles.card__footer_text}>
-                        rating {props.ratingsQuantity}
+                        rating ({props.ratingsQuantity})
                     </span>
                 </p>
 
                 <a
-                    href={`/tour/${props.slug}`}
+                    // href={`/tour/${props.slug}`}
+                    onClick={() => handleTourClick(props)}
                     className="btn btn--green btn--small btn__tour-item"
                     // className={styles.btn__green}
                 >

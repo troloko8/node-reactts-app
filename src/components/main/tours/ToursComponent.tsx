@@ -1,34 +1,42 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import TourItemCompont from './tour/tourItem/TourItemCompont'
-import apiService from '../../../services/APIService'
 import styles from './ToursComponent.module.css'
+import { ApiService } from '../../../services/APIService'
 
-interface Props {}
-
+const api = new ApiService()
 const fetchData = async (): Promise<Tour[]> => {
-    // const { data } = await axios.get('http://localhost:3001/api/v1/tours')
-    const { data } = await apiService.get<Tour[]>('tours', {
+    const { data } = await api.get<Tour[]>('tours', {
         // params: { page: 1, limit: 2 },
     })
 
     return data
 }
 
-// TODO stylish all components through new modern style way
-const ToursComponent: React.FC<Props> = (props) => {
-    const { data, error, isLoading } = useQuery<Tour[]>({
-        queryKey: ['data'],
+const ToursComponent: React.FC<unknown> = (props) => {
+    const { data: toursCached } = useQuery<Tour[]>({
+        queryKey: ['tours'],
+    })
+
+    const {
+        data: tours,
+        error,
+        isLoading,
+    } = useQuery<Tour[]>({
+        queryKey: ['tours'],
         queryFn: fetchData,
+        enabled: !!toursCached,
     })
 
     if (isLoading) return <p>Loading...</p>
     if (error) return <p>Error loading data</p>
+    if (!tours?.length) return <p>Didn't find any tours</p>
 
     return (
         <div className={styles.card_container}>
-            {data?.map((tour, key) => (
+            {tours?.map((tour, key) => (
                 <TourItemCompont {...tour} key={key} />
             )) ?? 'No any items ...'}
         </div>
