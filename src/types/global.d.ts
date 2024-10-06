@@ -35,5 +35,21 @@ type Tour = {
     }[]
     slug: string
     durationWeeks: number
+    reviews: Review[]
     _id: string
+}
+
+type Review = {
+    createdAt: string
+    _id: string
+    review: string
+    rating: number
+    user: {
+        photo: string
+        _id: string
+        name: string
+    }
+    tour: string
+    __v: number
+    id: string
 }

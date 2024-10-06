@@ -8,6 +8,7 @@ import { ApiService } from '../../../services/APIService'
 
 const api = new ApiService()
 const fetchData = async (): Promise<Tour[]> => {
+    // const { data } = await api.get<Tour[]>('tours', {
     const { data } = await api.get<Tour[]>('tours', {
         // params: { page: 1, limit: 2 },
     })
@@ -29,6 +30,8 @@ const ToursComponent: React.FC<unknown> = (props) => {
         queryFn: fetchData,
         enabled: !!toursCached,
     })
+
+    console.log(tours)
 
     if (isLoading) return <p>Loading...</p>
     if (error) return <p>Error loading data</p>

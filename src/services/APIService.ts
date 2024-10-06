@@ -61,6 +61,8 @@ export class ApiService {
         path: string,
         config?: AxiosRequestConfig,
     ): Promise<ApiResponse<T>> {
+        // FIXME revrite to .data
+        // return (await this.api.get(path, config)).data
         return this.api.get(path, config)
     }
 
