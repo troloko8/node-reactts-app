@@ -93,7 +93,8 @@ const TourComponent: React.FC<Tour | undefined> = (props) => {
                 <div className={styles.tourAbout}>
                     <h2
                         className={
-                            (styles.tourAbout__tiel, styles.tourOverview__title)
+                            (styles.tourAbout__title,
+                            styles.tourOverview__title)
                         }
                     >
                         About {tour.name} tour
@@ -158,14 +159,37 @@ const TourComponent: React.FC<Tour | undefined> = (props) => {
                 </ul>
             </section>
 
-            <section className="section-cta">
-                <div className="cta">
-                    <ul className="cta"></ul>
-                </div>
-                <div className="cta__content">
-                    {/* // FIXME do the fucctuional and data from res */}
-                    <h2 className="cta__title">What are you waiting for?</h2>
-                    <p className="cta__text"></p>
+            <section className={styles.section_cta}>
+                <ul className={styles.cta}>
+                    <li className={styles.cta__item}>
+                        <img
+                            src={`https://robohash.org/${Math.random() * 1000}`}
+                            alt=""
+                            className={`${styles.cta__img_logo} ${styles.cta__img}`}
+                        />
+                    </li>
+                    <li className={styles.cta__item}>
+                        <img
+                            src={`https://robohash.org/${Math.random() * 1000}`}
+                            alt=""
+                            className={styles.cta__img}
+                        />
+                    </li>
+                    <li className={styles.cta__item}>
+                        <img
+                            src={`https://robohash.org/${Math.random() * 1000}`}
+                            alt=""
+                            className={styles.cta__img}
+                        />
+                    </li>
+                </ul>
+                <div className={styles.cta__content}>
+                    <h2
+                        className={`${styles.cta__title} ${styles.tourOverview__title}`}
+                    >
+                        What are you waiting for?
+                    </h2>
+                    <p className={styles.cta__text}></p>
                     <button
                         className="btn btn--green span-all-rows"
                         data-tour-id={props?._id}
