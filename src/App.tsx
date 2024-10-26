@@ -7,8 +7,6 @@ import ToursComponent from './components/main//tours/ToursComponent'
 import TourComponentWrapper from './components/main/tours/tour/TourComponentWrapped'
 
 function App() {
-    // console.log(data)
-    // TODO
     // front for tourRow and TourFull
     //TODO create LoaderComponent for uploading new items
     return (
