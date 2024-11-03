@@ -28,7 +28,7 @@ const TourComponent: React.FC<Tour | undefined> = (props) => {
     } = useQuery<Tour>({
         queryKey: ['tour'],
         queryFn: () => fetchData(id ?? ''),
-        enabled: !!props ?? !!tourCached,
+        enabled: !!props && !!tourCached,
     })
 
     if (isLoading) return <p>Loading...</p>
