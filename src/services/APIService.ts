@@ -14,17 +14,23 @@ interface ApiResponse<T> {
     status: string
 }
 
+const API_BASE_URL = `${window.location.href.replace('3000', '3001')}api/v1/`
+
 export class ApiService {
     private api: AxiosInstance
     page: number = 0
     limit: number = 10
-    baseURL = 'http://localhost:3001/api/v1/'
+    // baseURL = 'http://localhost:3001/api/v1/'
+    // baseURL =
+    // 'https://scaling-telegram-wgqjr956qqx3g4qg-3001.app.github.dev/api/v1/'
+    baseURL = API_BASE_URL
 
     constructor() {
         this.api = axios.create({
             baseURL: this.baseURL,
             headers: {
                 'Content-Type': 'application/json',
+                // Accept: 'application/json',
             },
         })
 

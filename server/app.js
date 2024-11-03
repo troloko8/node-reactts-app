@@ -29,6 +29,9 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(
     cors({
         origin: 'http://localhost:3000', // Allow requests from React frontend
+        //   origin: 'http://localhost:3000', // Allow requests from React frontend
+        // origin: 'https://scaling-telegram-wgqjr956qqx3g4qg-3000.app.github.dev', // Allow requests from React frontend
+        // origin: '*', // Allow requests from React frontend
     }),
 )
 
