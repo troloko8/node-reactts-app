@@ -6,6 +6,7 @@ import './normalize.css'
 import ToursComponent from './components/main//tours/ToursComponent'
 import TourComponentWrapper from './components/main/tours/tour/TourComponentWrapped'
 import HeaderComponent from './components/header/HeaderComponent'
+import FooterComponent from './components/footer/FooterComponent'
 
 function App() {
     // front for tourRow and TourFull
@@ -23,6 +24,8 @@ function App() {
                     {/* //FIXME */}
                     {/* <Route path="*" element={<NotFound />} />  */}
                 </Routes>
+
+                <FooterComponent />
             </div>
         </Router>
     )
