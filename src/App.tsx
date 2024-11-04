@@ -5,6 +5,7 @@ import './App.css'
 import './normalize.css'
 import ToursComponent from './components/main//tours/ToursComponent'
 import TourComponentWrapper from './components/main/tours/tour/TourComponentWrapped'
+import HeaderComponent from './components/header/HeaderComponent'
 
 function App() {
     // front for tourRow and TourFull
@@ -12,6 +13,7 @@ function App() {
     return (
         <Router>
             <div className="main">
+                <HeaderComponent />
                 <Routes>
                     <Route path="/" element={<ToursComponent />} />
                     <Route

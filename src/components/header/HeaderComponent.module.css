@@ -1,0 +1,61 @@
+.header {
+    background-color: #444;
+    padding: 0 5rem;
+    height: 8rem;
+    position: relative;
+    z-index: 100;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+.header__logo_pic {
+    width: 60px;
+}
+
+.authorization {
+    display: flex;
+    gap: 20px;
+}
+
+.navigation__item {
+    color: #f7f7f7;
+    text-transform: uppercase;
+    font-size: 1.6rem;
+    text-decoration: none;
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-transition: all 0.2s;
+    transition: all 0.2s;
+    font-weight: 400;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.authorization__signup {
+    padding: 1rem 3rem;
+    border-radius: 10rem;
+    border: 1px solid currentColor !important;
+    -webkit-transition: all 0.3s;
+    transition: background-color 0.3s;
+    background-color: transparent;
+}
+
+.authorization__signup :hover {
+    background-color: #fff;
+
+}
+
