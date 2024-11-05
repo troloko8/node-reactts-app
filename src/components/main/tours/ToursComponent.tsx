@@ -31,8 +31,6 @@ const ToursComponent: React.FC<unknown> = (props) => {
         enabled: !!toursCached,
     })
 
-    console.log(tours)
-
     if (isLoading) return <p>Loading...</p>
     if (error) return <p>Error loading data</p>
     if (!tours?.length) return <p>Didn't find any tours</p>
