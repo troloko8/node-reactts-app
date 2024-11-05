@@ -7,24 +7,27 @@ import ToursComponent from './components/main//tours/ToursComponent'
 import TourComponentWrapper from './components/main/tours/tour/TourComponentWrapped'
 import HeaderComponent from './components/header/HeaderComponent'
 import FooterComponent from './components/footer/FooterComponent'
+import LoginPageView from './components/main/autorization/login/LoginPageView'
 
 function App() {
     // front for tourRow and TourFull
     //TODO create LoaderComponent for uploading new items
     return (
         <Router>
-            <div className="main">
+            <div className="app">
                 <HeaderComponent />
-                <Routes>
-                    <Route path="/" element={<ToursComponent />} />
-                    <Route
-                        path="/tours/:id"
-                        element={<TourComponentWrapper />}
-                    />
-                    {/* //FIXME */}
-                    {/* <Route path="*" element={<NotFound />} />  */}
-                </Routes>
-
+                <main className="main">
+                    <Routes>
+                        <Route path="/" element={<ToursComponent />} />
+                        <Route path="/login" element={<LoginPageView />} />
+                        <Route
+                            path="/tours/:id"
+                            element={<TourComponentWrapper />}
+                        />
+                        {/* //FIXME */}
+                        {/* <Route path="*" element={<NotFound />} />  */}
+                    </Routes>
+                </main>
                 <FooterComponent />
             </div>
         </Router>
