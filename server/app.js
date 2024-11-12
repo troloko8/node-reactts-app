@@ -22,16 +22,16 @@ const { webhooCheckout } = require('./controllers/bookingController')
 const app = express()
 
 app.enable('trust proxy')
-
 app.set('view engine', 'pug')
 app.set('views', path.join(__dirname, 'views'))
 
 app.use(
     cors({
-        // origin: 'http://localhost:3000', // Allow requests from React frontend
-        //   origin: 'http://localhost:3000', // Allow requests from React frontend
+        origin: 'http://localhost:3000', // Allow requests from React frontend
         // origin: 'https://scaling-telegram-wgqjr956qqx3g4qg-3000.app.github.dev', // Allow requests from React frontend
-        origin: '*', // Allow requests from React frontend
+        // origin: '*', // Allow requests from React frontend
+
+        credentials: true, // allow to send req from browsers with cookies etc.
     }),
 )
 
@@ -41,7 +41,7 @@ app.use(express.static(path.join(__dirname, 'public'))) // sets up a new root fo
 
 // 1)GLOBAL MIDDLWARES
 // Implctaement CORS
-app.use(cors()) // Acces-Control-Allow-Origin all
+// app.use(cors()) // Acces-Control-Allow-Origin all
 // examaple: api.natours.com (main) natours.com(FrontEnd) solution:
 // app.use(cors({
 //     origin: 'https://www.natours.com'
