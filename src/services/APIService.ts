@@ -6,6 +6,8 @@ import axios, {
     InternalAxiosRequestConfig,
 } from 'axios'
 
+axios.defaults.withCredentials = true
+
 // Define types for request/response data
 interface ApiResponse<T> {
     data: T

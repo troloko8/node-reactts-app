@@ -3,29 +3,13 @@
 import React, { useState } from 'react'
 
 import styles from './LoginPageView.module.css'
-import { ApiService } from '../../../../services/APIService'
-import { useMutation } from '@tanstack/react-query'
-import { useAuthContext } from '../../../../App'
-import { useNavigate } from 'react-router-dom'
+import { useAuthContext } from '../../../global/useAuthContext'
 
 interface Props {}
-
-const api = new ApiService()
 
 type LoginDataType = {
     email: string
     password: string
-}
-const fetchData = async ({
-    email,
-    password,
-}: LoginDataType): Promise<LoginApiResponse> => {
-    const res = await api.post<LoginApiResponse>('/users/login', {
-        email,
-        password,
-    })
-    //FIXME
-    return res as any
 }
 
 const LoginPageView: React.FC<Props> = () => {
@@ -33,23 +17,8 @@ const LoginPageView: React.FC<Props> = () => {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const navigate = useNavigate()
 
-    // const [mutate, { isLoading, isError, error }] = useMutation<
-    const loginMutation = useMutation<LoginApiResponse, Error, LoginDataType>({
-        mutationFn: fetchData,
-        onSuccess: (data) => {
-            // console.log('Login successful:', data)
-            localStorage.setItem('token', data.token)
-
-            context.setIsAuth(true)
-
-            navigate('/me')
-        },
-        onError: (error) => {
-            console.error('Login failed:', error.message)
-        },
-    })
+    const loginMutation = context.login
 
     const login = (
         // e: React.ChangeEvent<HTMLInputElement>,
