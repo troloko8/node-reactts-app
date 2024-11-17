@@ -25,6 +25,6 @@
   },
   "include": [
     "src"
-  ],
+, "src/components/global/.tsx"  ],
   "exclude": ["node_modules", "build"]   // Exclude node_modules and build folders
 }

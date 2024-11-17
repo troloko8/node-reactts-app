@@ -11,6 +11,7 @@ const AccountComponent: React.FC<Props> = (props) => {
 
     return (
         <div className={styles.authorization}>
+            {/* TODO add isLoding and add loading component */}
             {account.isAuth ? <MyProfileView {...account} /> : <AuthView />}
         </div>
     )

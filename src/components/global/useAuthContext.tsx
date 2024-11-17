@@ -109,9 +109,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
     })
 
-    //FIXME
-    //const logoutMutation
-
     useEffect(() => {
         isLoggedMutation.mutate()
     }, [])

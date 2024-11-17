@@ -9,6 +9,8 @@ import HeaderComponent from './components/header/HeaderComponent'
 import FooterComponent from './components/footer/FooterComponent'
 import LoginPageView from './components/main/autorization/login/LoginPageView'
 import { AuthProvider } from './components/global/useAuthContext'
+import ProfileView from './components/profile/ProfileView'
+import ProfileContentView from './components/profile/profileContent/ProfileContentView'
 
 function App() {
     // front for tourRow and TourFull
@@ -26,6 +28,37 @@ function App() {
                                 path="/tours/:id"
                                 element={<TourComponentWrapper />}
                             />
+                            <Route path="/me" element={<ProfileView />}>
+                                <Route index element={<ProfileContentView />} />
+                                <Route
+                                    path="tours"
+                                    element={<ProfileContentView />}
+                                />
+                                <Route
+                                    path="reviews"
+                                    element={<ProfileContentView />}
+                                />
+                                <Route
+                                    path="biling"
+                                    element={<ProfileContentView />}
+                                />
+                                <Route
+                                    path="tours-manager"
+                                    element={<ProfileContentView />}
+                                />
+                                <Route
+                                    path="users-manager"
+                                    element={<ProfileContentView />}
+                                />
+                                <Route
+                                    path="reviews-manager"
+                                    element={<ProfileContentView />}
+                                />
+                                <Route
+                                    path="booking-manager"
+                                    element={<ProfileContentView />}
+                                />
+                            </Route>
                             {/* //FIXME */}
                             {/* <Route path="*" element={<NotFound />} />  */}
                         </Routes>
