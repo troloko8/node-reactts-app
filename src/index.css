@@ -1,6 +1,7 @@
 :root {
   --section-rotate: 9vh;
-  --green-color: #55c57a
+  --green-color: #55c57a;
+  --gray-color: #777
 }
 
 html {

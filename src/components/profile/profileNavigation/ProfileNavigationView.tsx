@@ -56,6 +56,7 @@ const ProfileNavigationView: React.FC<Props> = (props) => {
         <nav className={styles.profileNav}>
             <ul className={styles.profileNav__list}>
                 {userConfiq.map((item, i) => (
+                    //FIXME add active class through navLink fun
                     <ProfileNavigationList key={i} {...item} />
                 ))}
             </ul>

@@ -1,4 +1,5 @@
 .profile {
     height: inherit;
     min-height: inherit;
+    display: flex;
 }

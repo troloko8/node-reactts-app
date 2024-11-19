@@ -1,0 +1,7 @@
+.settings {
+    display: flex;
+    flex-direction: column;
+    color: var(--gray-color);
+    /* color: red; */
+}
+
