@@ -3,6 +3,11 @@ import { useAuthContext } from '../../../global/useAuthContext'
 
 import global from './../../../global/global.module.css'
 import styles from './SettingsView.module.css'
+import { ApiResponse, ApiService } from '../../../../services/APIService'
+import { withPreventDefault } from '../../../global/helpers'
+import { useMutation } from '@tanstack/react-query'
+
+const api = new ApiService()
 
 interface Props {}
 
@@ -18,7 +23,6 @@ const SettingsView: React.FC<Props> = (props) => {
 
     useEffect(() => {
         setName(user?.name ?? '')
-
         setEmail(user?.email ?? '')
         //FIXME photo
     }, [user])
@@ -40,12 +44,36 @@ const SettingsView: React.FC<Props> = (props) => {
     )
 }
 
-const AccountView: React.FC<{
+// FIXME add photo functional
+const updateUser = async (user: UserReq) => {
+    const res = await api.patch<User>('/users/updateMe', user)
+
+    return res
+}
+
+type AccountProps = {
     name: string
     email: string
     setName: Dispatch<string>
     setEmail: Dispatch<string>
-}> = ({ name, email, setName, setEmail }) => {
+}
+
+const AccountView: React.FC<AccountProps> = React.memo(function account({
+    name,
+    email,
+    setName,
+    setEmail,
+}: AccountProps) {
+    const userDataMutation = useMutation<ApiResponse<User>, Error, UserReq>({
+        mutationFn: updateUser,
+        onSuccess: (res) => {
+            console.log({ res })
+        },
+        onError: (error) => {
+            console.error('Logout failed:', error.message)
+        },
+    })
+
     const nameHandler = (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault()
         setName(e.target.value)
@@ -57,9 +85,16 @@ const AccountView: React.FC<{
     }
 
     return (
-        <div className="settings__box">
-            <h2 className={global.title_secondary}>Your Account Settings</h2>
-            <form action="" className={global.form}>
+        <div className={styles.settings__box}>
+            <h2
+                className={`${global.title_secondary} ${styles.settings__title}`}
+            >
+                Your Account Settings
+            </h2>
+            <form
+                action=""
+                className={`${global.form} ${styles.settings__form}`}
+            >
                 <InputBoxView
                     type="text"
                     value={name}
@@ -79,8 +114,8 @@ const AccountView: React.FC<{
                     setValue={emailHandler}
                 />
 
-                <div className="settings__userPhoto">
-                    <img src="" alt="" className="settings__picture" />
+                <div className={styles.settings__userPhoto}>
+                    <img src="" alt="" className={styles.settings__picture} />
                     <input
                         className={global.form__upload}
                         type="file"
@@ -92,19 +127,71 @@ const AccountView: React.FC<{
                         Choose a new photo
                     </label>
                 </div>
+
+                <button
+                    style={{ marginLeft: 'auto' }}
+                    className={`${global.btn} ${global.btn__small} ${global.btn__green}`}
+                    onClick={withPreventDefault(() =>
+                        userDataMutation.mutate({ name, email }),
+                    )}
+                >
+                    Save settings
+                </button>
+                {/* FIXME */}
+                {userDataMutation.isPending && <p>Loading...</p>}
+                {userDataMutation.isError && <p>Error logging in</p>}
             </form>
         </div>
     )
-}
+})
 
-const PasswordView: React.FC<{
+type PasswordProps = {
     curPass: string
     pass: string
     confirmPass: string
     setCurPass: Dispatch<string>
     setPass: Dispatch<string>
     setConfirmPass: Dispatch<string>
-}> = ({ curPass, setCurPass, pass, setPass, confirmPass, setConfirmPass }) => {
+}
+
+type PasswordReq = {
+    curPassword: string
+    password: string
+    passwordConfirm: string
+}
+
+const updatePassword = async (passObj: PasswordReq) => {
+    const res = await api.patch<LoginApiResponse>(
+        '/users/updateMyPassword',
+        passObj,
+    )
+
+    return res
+}
+
+const PasswordView: React.FC<PasswordProps> = React.memo(function password({
+    curPass,
+    setCurPass,
+    pass,
+    setPass,
+    confirmPass,
+    setConfirmPass,
+}: PasswordProps) {
+    const passwordMutation = useMutation<
+        ApiResponse<LoginApiResponse>,
+        Error,
+        PasswordReq
+    >({
+        mutationFn: updatePassword,
+        onSuccess: (res) => {
+            console.log({ res })
+        },
+        onError: (error) => {
+            console.error('Logout failed:', error.message)
+            // setError(error.message)
+        },
+    })
+
     const curPassHandler = (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault()
         setCurPass(e.target.value)
@@ -121,9 +208,16 @@ const PasswordView: React.FC<{
     }
 
     return (
-        <div className="settings__box">
-            <h2 className={global.title_secondary}>Password Change</h2>
-            <form action="" className="form settings__form">
+        <div className={styles.settings__box}>
+            <h2
+                className={`${global.title_secondary} ${styles.settings__title}`}
+            >
+                Password Change
+            </h2>
+            <form
+                action=""
+                className={`${global.form} ${styles.settings__form}`}
+            >
                 <InputBoxView
                     type="password"
                     value={curPass}
@@ -156,10 +250,27 @@ const PasswordView: React.FC<{
                     setValue={confirmPassHandler}
                     placeholder="***********"
                 />
+
+                <button
+                    style={{ marginLeft: 'auto' }}
+                    className={`${global.btn} ${global.btn__small} ${global.btn__green}`}
+                    onClick={withPreventDefault(() => {
+                        passwordMutation.mutate({
+                            curPassword: curPass,
+                            password: pass,
+                            passwordConfirm: confirmPass,
+                        })
+                    })}
+                >
+                    Save settings
+                </button>
+                {/* //FIXME */}
+                {passwordMutation.isPending && <p>Loading...</p>}
+                {passwordMutation.isError && <p>Error logging in</p>}
             </form>
         </div>
     )
-}
+})
 
 export type InputType = {
     type: string

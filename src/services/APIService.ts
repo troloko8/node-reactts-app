@@ -9,7 +9,7 @@ import axios, {
 axios.defaults.withCredentials = true
 
 // Define types for request/response data
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
     data: T
     requestedAt: string
     results: number
@@ -90,6 +90,14 @@ export class ApiService {
         config?: AxiosRequestConfig,
     ): Promise<ApiResponse<T>> {
         return this.api.put(path, data, config)
+    }
+
+    public async patch<T>(
+        path: string,
+        data: unknown,
+        config?: AxiosRequestConfig,
+    ): Promise<ApiResponse<T>> {
+        return this.api.patch(path, data, config)
     }
 
     // DELETE request

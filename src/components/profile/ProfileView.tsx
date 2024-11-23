@@ -9,6 +9,8 @@ interface Props {}
 const ProfileView: React.FC<Props> = (props) => {
     return (
         <div className={styles.profile}>
+            {/* FIXME */}
+            {/* if not logged in display error page with lig in error */}
             <ProfileNavigationView />
 
             <Outlet />

@@ -71,3 +71,9 @@ type User = {
     __v: number
     passwordChangedAt: string
 }
+
+type UserReq = {
+    photo?: string
+    name?: string
+    email?: string
+}

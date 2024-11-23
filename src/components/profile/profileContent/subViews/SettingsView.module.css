@@ -2,6 +2,24 @@
     display: flex;
     flex-direction: column;
     color: var(--gray-color);
+    flex: 1;
     /* color: red; */
+}
+
+.settings__box {
+    padding: 8rem 8rem 0 ;
+    /* max-width: 500px; */
+    width: clamp(320px, 700px, 100%);
+    margin: 0 auto;
+}
+
+.settings__form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.settings__title {
+    margin-bottom: 2rem;
 }
 
