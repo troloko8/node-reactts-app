@@ -31,8 +31,9 @@ export class ApiService {
         this.api = axios.create({
             baseURL: this.baseURL,
             headers: {
-                'Content-Type': 'application/json',
+                // 'Content-Type': 'application/json',
                 // Accept: 'application/json',
+                // 'Content-Type': 'multipart/form-data', // Optional: Usually, axios handles this
             },
         })
 

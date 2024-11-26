@@ -73,7 +73,7 @@ type User = {
 }
 
 type UserReq = {
-    photo?: string
+    photo?: File
     name?: string
     email?: string
 }

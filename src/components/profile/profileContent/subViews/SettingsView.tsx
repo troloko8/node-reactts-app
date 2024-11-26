@@ -12,20 +12,12 @@ const api = new ApiService()
 interface Props {}
 
 const SettingsView: React.FC<Props> = (props) => {
-    const { user } = useAuthContext()
-
-    const [name, setName] = useState<string>(user?.name ?? '')
-    const [email, setEmail] = useState<string>(user?.email ?? '')
+    const [name, setName] = useState<string>('')
+    const [email, setEmail] = useState<string>('')
 
     const [curPass, setCurPass] = useState<string>('')
     const [pass, setPass] = useState<string>('')
     const [confirmPass, setConfirmPass] = useState<string>('')
-
-    useEffect(() => {
-        setName(user?.name ?? '')
-        setEmail(user?.email ?? '')
-        //FIXME photo
-    }, [user])
 
     return (
         <div className={styles.settings}>
@@ -45,7 +37,8 @@ const SettingsView: React.FC<Props> = (props) => {
 }
 
 // FIXME add photo functional
-const updateUser = async (user: UserReq) => {
+// const updateUser = async (user: UserReq) => {
+const updateUser = async (user: FormData) => {
     const res = await api.patch<User>('/users/updateMe', user)
 
     return res
@@ -64,7 +57,17 @@ const AccountView: React.FC<AccountProps> = React.memo(function account({
     setName,
     setEmail,
 }: AccountProps) {
-    const userDataMutation = useMutation<ApiResponse<User>, Error, UserReq>({
+    const { user } = useAuthContext()
+
+    const [photoFile, setPhotoFile] = useState<File | undefined>()
+
+    useEffect(() => {
+        setName(user?.name ?? '')
+        setEmail(user?.email ?? '')
+        //FIXME photo
+    }, [user])
+
+    const userDataMutation = useMutation<ApiResponse<User>, Error, FormData>({
         mutationFn: updateUser,
         onSuccess: (res) => {
             console.log({ res })
@@ -114,26 +117,25 @@ const AccountView: React.FC<AccountProps> = React.memo(function account({
                     setValue={emailHandler}
                 />
 
-                <div className={styles.settings__userPhoto}>
-                    <img src="" alt="" className={styles.settings__picture} />
-                    <input
-                        className={global.form__upload}
-                        type="file"
-                        accept="image/*"
-                        id="photo"
-                        name="photo"
-                    />
-                    <label htmlFor="photo" className={global.btn_text}>
-                        Choose a new photo
-                    </label>
-                </div>
+                <ImgUploaderView setPhotoFile={setPhotoFile} />
 
                 <button
                     style={{ marginLeft: 'auto' }}
                     className={`${global.btn} ${global.btn__small} ${global.btn__green}`}
-                    onClick={withPreventDefault(() =>
-                        userDataMutation.mutate({ name, email }),
-                    )}
+                    onClick={withPreventDefault(() => {
+                        const form = new FormData()
+                        form.append('name', name)
+                        form.append('email', email)
+
+                        // Append photo only if valid
+                        if (photoFile) {
+                            form.append('photo', photoFile)
+                        } else {
+                            console.warn('No photo file selected.')
+                        }
+
+                        userDataMutation.mutate(form)
+                    })}
                 >
                     Save settings
                 </button>
@@ -144,6 +146,58 @@ const AccountView: React.FC<AccountProps> = React.memo(function account({
         </div>
     )
 })
+
+interface ImgUploaderViewProps {
+    setPhotoFile: React.Dispatch<File | undefined>
+}
+
+const ImgUploaderView: React.FC<ImgUploaderViewProps> = ({ setPhotoFile }) => {
+    const [imageSrc, setImageSrc] = useState<string>('/img/default.jpg')
+
+    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0] // Get the first file selected
+
+        if (file) {
+            setPhotoFile(file)
+
+            const reader = new FileReader()
+
+            reader.onload = () => {
+                // Set the image source to the file's data URL
+                setImageSrc(reader.result as string)
+            }
+
+            reader.readAsDataURL(file) // Read the file as a data URL
+        }
+    }
+
+    // useEffect(() => {
+    //     //FIXME
+    // setImageSrc(userpicture)
+    // }, userpicture)
+
+    return (
+        <div className={styles.settings__userPhoto}>
+            <img
+                // src={`/img/default.jpg`}
+                src={imageSrc}
+                alt="User Photo"
+                className={styles.settings__picture}
+            />
+            <input
+                className={global.form__upload}
+                type="file"
+                onChange={handleImageUpload}
+                accept="image/*"
+                id="photo"
+                name="photo"
+            />
+            <label htmlFor="photo" className={global.btn_text}>
+                Choose a new photo
+            </label>
+        </div>
+    )
+}
 
 type PasswordProps = {
     curPass: string
