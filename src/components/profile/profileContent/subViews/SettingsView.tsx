@@ -152,6 +152,8 @@ interface ImgUploaderViewProps {
 }
 
 const ImgUploaderView: React.FC<ImgUploaderViewProps> = ({ setPhotoFile }) => {
+    const { user } = useAuthContext()
+
     const [imageSrc, setImageSrc] = useState<string>('/img/default.jpg')
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,13 +173,12 @@ const ImgUploaderView: React.FC<ImgUploaderViewProps> = ({ setPhotoFile }) => {
         }
     }
 
-    // useEffect(() => {
-    //     //FIXME
-    // setImageSrc(userpicture)
-    // }, userpicture)
+    useEffect(() => {
+        //FIXME
+        setImageSrc(user?.photo ?? '/img/default.jpg')
+    }, [user?.photo])
 
     // TODO
-    //  create aws3API method to add picture to your bucket
     // add a new picture OR instead of old one (to replace ild and did'nt delete old from DB) or add new with and delete old
     // create aws3API to tourCovers and tourImages
     // rewrite Pathes to get picture for all platfotm
@@ -185,8 +186,7 @@ const ImgUploaderView: React.FC<ImgUploaderViewProps> = ({ setPhotoFile }) => {
     return (
         <div className={styles.settings__userPhoto}>
             <img
-                src={`https://natours-pp.s3.eu-north-1.amazonaws.com/UserPhotos/user-1.jpg`}
-                // src={imageSrc}
+                src={imageSrc}
                 alt="User Photo"
                 className={styles.settings__picture}
             />

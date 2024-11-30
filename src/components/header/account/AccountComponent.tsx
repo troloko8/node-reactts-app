@@ -28,7 +28,7 @@ const MyProfileView: React.FC<authProps> = (account) => {
 
             <Link className={`${styles.navigation__item}`} to="/me">
                 <img
-                    src={`https://robohash.org/${Math.random() * 1000}`}
+                    src={account.user?.photo ?? '/img/default.jpg'}
                     alt="Acc Photo"
                     className={styles.navigation__img}
                 />
