@@ -72,7 +72,8 @@ exports.saveUserPhotoS3 = catchAsync(async (req, res, next) => {
 
     // Define the key (filename) for the image
     const folderName = 'UserPhotos'
-    const fileKey = `${folderName}/user-${req.user.id}-${Date.now()}__DELETE.jpeg`
+    // const fileKey = `${folderName}/user-${req.user.id}-${Date.now()}__DELETE.jpeg`
+    const fileKey = `${folderName}/user-${req.user.id}.jpeg`
 
     // Upload the processed image to S3
     const command = new PutObjectCommand({
