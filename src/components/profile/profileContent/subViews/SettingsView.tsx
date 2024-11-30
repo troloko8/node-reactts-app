@@ -176,11 +176,17 @@ const ImgUploaderView: React.FC<ImgUploaderViewProps> = ({ setPhotoFile }) => {
     // setImageSrc(userpicture)
     // }, userpicture)
 
+    // TODO
+    //  create aws3API method to add picture to your bucket
+    // add a new picture OR instead of old one (to replace ild and did'nt delete old from DB) or add new with and delete old
+    // create aws3API to tourCovers and tourImages
+    // rewrite Pathes to get picture for all platfotm
+
     return (
         <div className={styles.settings__userPhoto}>
             <img
-                // src={`/img/default.jpg`}
-                src={imageSrc}
+                src={`https://natours-pp.s3.eu-north-1.amazonaws.com/UserPhotos/user-1.jpg`}
+                // src={imageSrc}
                 alt="User Photo"
                 className={styles.settings__picture}
             />

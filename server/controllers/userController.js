@@ -1,5 +1,8 @@
 const multer = require('multer')
 const sharp = require('sharp')
+const multerS3 = require('multer-s3')
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3')
+
 const User = require('../models/userModel')
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/AppError')
@@ -17,7 +20,6 @@ const factory = require('./handlerFactory')
 // })
 
 // Settings for uploading file to memory more efficient way
-
 const multerStorage = multer.memoryStorage()
 
 const multerFilter = (req, file, cb) => {
@@ -35,16 +37,57 @@ const upload = multer({
 
 exports.uploadUserPhoto = upload.single('photo')
 
-exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
+// const resizeUserPhoto = catchAsync(async (req, res, next) => {
+//     if (!req.file) return next()
+
+//     req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`
+
+//     await sharp(req.file.buffer)
+//         .resize(500, 500)
+//         .toFormat('jpeg')
+//         .jpeg({ quality: 90 })
+//         .toFile(`public/img/users/${req.file.filename}`)
+
+//     next()
+// })
+
+const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+})
+
+exports.saveUserPhotoS3 = catchAsync(async (req, res, next) => {
+    // Ensure file exists
     if (!req.file) return next()
 
-    req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`
+    // Use Sharp to process the image
+    const resizedImageBuffer = await sharp(req.file.buffer)
+        .resize(250, 250) // Resize to 250x250
+        .toFormat('jpeg') // Convert to JPEG
+        .jpeg({ quality: 90 }) // Set quality to 90
+        .toBuffer() // Get the processed image as a buffer
 
-    await sharp(req.file.buffer)
-        .resize(500, 500)
-        .toFormat('jpeg')
-        .jpeg({ quality: 90 })
-        .toFile(`public/img/users/${req.file.filename}`)
+    // Define the key (filename) for the image
+    const folderName = 'UserPhotos'
+    const fileKey = `${folderName}/user-${req.user.id}-${Date.now()}__DELETE.jpeg`
+
+    // Upload the processed image to S3
+    const command = new PutObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: fileKey, // Filename in the bucket
+        Body: resizedImageBuffer, // Processed image buffer
+        ContentType: 'image/jpeg', // Specify the content type
+        // ACL: 'public-read', // Optional: Make the file publicly readable
+    })
+
+    await s3.send(command)
+
+    // Construct the S3 file URL
+    const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`
+    req.file.path = imageUrl
 
     next()
 })
@@ -77,7 +120,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     // 2)Update user data
     const filteredBody = filterReq(req.body, 'name', 'email')
     // add filename as a path to find the image afterward
-    if (req.file) filteredBody.photo = req.file.filename
+    // if (req.file) filteredBody.photo = req.file.filename
+    if (req.file) filteredBody.photo = req.file.path
 
     const updatedUser = await User.findByIdAndUpdate(
         req.user.id,

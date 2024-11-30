@@ -12,6 +12,7 @@ const {
     getMe,
     uploadUserPhoto,
     resizeUserPhoto,
+    saveUserPhotoS3,
 } = require(`../controllers/userController`)
 const {
     signup,
@@ -35,7 +36,8 @@ router.patch('/resetPassword/:token', resetPassword)
 router.use(protect)
 
 router.patch('/updateMyPassword', updatePassword)
-router.patch('/updateMe', uploadUserPhoto, resizeUserPhoto, updateMe)
+// router.patch('/updateMe', uploadUserPhoto, resizeUserPhoto, updateMe)
+router.patch('/updateMe', uploadUserPhoto, saveUserPhotoS3, updateMe)
 router.delete('/deleteMe', deleteMe)
 router.get('/me', getMe, getUser)
 
