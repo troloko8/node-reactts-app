@@ -1,16 +1,14 @@
 const express = require('express')
-const { 
-    getOverview, 
+const {
+    getOverview,
     getTour,
     getLoginForm,
     getAccount,
     updateUserData,
     getMyTours,
-    alerts
+    alerts,
 } = require('../controllers/viewsController')
-const { 
-    isLoggedIn, protect 
-} = require('../controllers/authController')
+const { isLoggedIn, protect } = require('../controllers/authController')
 const { createBookingCheckout } = require('../controllers/bookingController.js')
 
 const router = express.Router()
@@ -20,10 +18,10 @@ router.use(alerts)
 // router.use(isLoggedIn)
 
 router.get(
-    '/', 
-    // createBookingCheckout, 
-    isLoggedIn, 
-    getOverview
+    '/',
+    // createBookingCheckout,
+    isLoggedIn,
+    getOverview,
 )
 
 router.get('/tour/:name', isLoggedIn, getTour)

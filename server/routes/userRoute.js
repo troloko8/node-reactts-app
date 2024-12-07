@@ -13,6 +13,7 @@ const {
     uploadUserPhoto,
     resizeUserPhoto,
     saveUserPhotoS3,
+    getMyTours,
 } = require(`../controllers/userController`)
 const {
     signup,
@@ -40,6 +41,7 @@ router.patch('/updateMyPassword', updatePassword)
 router.patch('/updateMe', uploadUserPhoto, saveUserPhotoS3, updateMe)
 router.delete('/deleteMe', deleteMe)
 router.get('/me', getMe, getUser)
+router.get('/myTours', getMyTours)
 
 router.use(restrictToByRole('admin'))
 

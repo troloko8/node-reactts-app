@@ -7,6 +7,8 @@ const User = require('../models/userModel')
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/AppError')
 const factory = require('./handlerFactory')
+const Tour = require('../models/tourModels')
+const Booking = require('../models/bookingModel')
 
 // Settings for uploading file to dist
 // const multerStorage = multer.diskStorage({
@@ -156,6 +158,23 @@ exports.createUser = (req, res) => {
         message: 'this route is not defined! Please use singnup',
     })
 }
+
+exports.getMyTours = catchAsync(async (req, res) => {
+    // 1) find all my bookings
+    const bookings = await Booking.find({ user: req.user.id })
+
+    // // 2) find tours with the returned ids
+    const tourIDs = bookings.map((el) => el.tour)
+
+    const tours = await Tour.find({ _id: { $in: tourIDs } })
+
+    res.status(200).json({
+        status: 'succes',
+        data: {
+            tours,
+        },
+    })
+})
 
 exports.getUser = factory.getOne(User)
 exports.getAllUsers = factory.getAll(User)

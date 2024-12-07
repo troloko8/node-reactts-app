@@ -36,7 +36,6 @@ const SettingsView: React.FC<Props> = (props) => {
     )
 }
 
-// FIXME add photo functional
 // const updateUser = async (user: UserReq) => {
 const updateUser = async (user: FormData) => {
     const res = await api.patch<User>('/users/updateMe', user)
@@ -64,7 +63,6 @@ const AccountView: React.FC<AccountProps> = React.memo(function account({
     useEffect(() => {
         setName(user?.name ?? '')
         setEmail(user?.email ?? '')
-        //FIXME photo
     }, [user])
 
     const userDataMutation = useMutation<ApiResponse<User>, Error, FormData>({
@@ -174,14 +172,8 @@ const ImgUploaderView: React.FC<ImgUploaderViewProps> = ({ setPhotoFile }) => {
     }
 
     useEffect(() => {
-        //FIXME
         setImageSrc(user?.photo ?? '/img/default.jpg')
     }, [user?.photo])
-
-    // TODO
-    // add a new picture OR instead of old one (to replace ild and did'nt delete old from DB) or add new with and delete old
-    // create aws3API to tourCovers and tourImages
-    // rewrite Pathes to get picture for all platfotm
 
     return (
         <div className={styles.settings__userPhoto}>
