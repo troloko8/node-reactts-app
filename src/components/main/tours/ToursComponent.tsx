@@ -7,7 +7,7 @@ import styles from './ToursComponent.module.css'
 import { ApiService } from '../../../services/APIService'
 
 const api = new ApiService()
-const fetchData = async (): Promise<Tour[]> => {
+const getTours = async (): Promise<Tour[]> => {
     // const { data } = await api.get<Tour[]>('tours', {
     const { data } = await api.get<Tour[]>('tours', {
         // params: { page: 1, limit: 2 },
@@ -27,7 +27,7 @@ const ToursComponent: React.FC<unknown> = (props) => {
         isLoading,
     } = useQuery<Tour[]>({
         queryKey: ['tours'],
-        queryFn: fetchData,
+        queryFn: getTours,
         enabled: !!toursCached,
     })
 

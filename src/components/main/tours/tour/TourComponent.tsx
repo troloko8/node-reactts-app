@@ -10,7 +10,6 @@ const api = new ApiService()
 const fetchData = async (id: string): Promise<Tour> => {
     const { data } = await api.get<Tour>(`tours/${id}`)
     // const data = await api.get<Tour>(`tours/${id}`)
-    console.log(data)
 
     return data
 }
@@ -35,16 +34,13 @@ const TourComponent: React.FC<Tour | undefined> = (props) => {
     if (error) return <p>Error loading data</p>
     if (!tour) return <p>Tour is not found</p>
 
-    console.log(props ?? tour)
-
     return (
         <div>
             <section className={styles.section_header}>
                 <div className={styles.header__hero}>
                     <div className={styles.header__hero_background}></div>
                     <img
-                        // src={props?.imageCover ?? ''}
-                        src="https://natureconservancy-h.assetsadobe.com/is/image/content/dam/tnc/nature/en/photos/w/o/WOPA160517_D056-resized.jpg?crop=864%2C0%2C1728%2C2304&wid=600&hei=800&scl=2.88"
+                        src={props?.imageCover ?? ''}
                         alt="Img"
                         className={styles.header__hero_img}
                     />
@@ -112,7 +108,7 @@ const TourComponent: React.FC<Tour | undefined> = (props) => {
                     {tour.images.map((img, i) => (
                         <li className={styles.tourPictures__item} key={i}>
                             <img
-                                src="https://picsum.photos/200"
+                                src={img}
                                 alt="tour picture"
                                 className={styles.tourPictures__img}
                             />
@@ -162,27 +158,15 @@ const TourComponent: React.FC<Tour | undefined> = (props) => {
             <section className={styles.section_cta}>
                 <div className={styles.cta}>
                     <ul className={styles.cta__list}>
-                        <li className={styles.cta__item}>
-                            <img
-                                src={`https://robohash.org/${Math.random() * 1000}`}
-                                alt=""
-                                className={`${styles.cta__img_logo} ${styles.cta__img}`}
-                            />
-                        </li>
-                        <li className={styles.cta__item}>
-                            <img
-                                src={`https://robohash.org/${Math.random() * 1000}`}
-                                alt=""
-                                className={styles.cta__img}
-                            />
-                        </li>
-                        <li className={styles.cta__item}>
-                            <img
-                                src={`https://robohash.org/${Math.random() * 1000}`}
-                                alt=""
-                                className={styles.cta__img}
-                            />
-                        </li>
+                        {props?.images.map((img, i) => (
+                            <li className={styles.cta__item} key={i}>
+                                <img
+                                    src={img}
+                                    alt="picture"
+                                    className={`${i == 0 ? styles.cta__img_logo : ''} ${styles.cta__img}`}
+                                />
+                            </li>
+                        ))}
                     </ul>
                     <div className={styles.cta__content}>
                         <div className={styles.cta__info}>
