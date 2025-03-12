@@ -164,6 +164,7 @@ const TourComponent: React.FC<Tour | undefined> = (props) => {
                                     src={img}
                                     alt="picture"
                                     className={`${i == 0 ? styles.cta__img_logo : ''} ${styles.cta__img}`}
+                                    // style={{ zIndex: 2 - i }}
                                 />
                             </li>
                         ))}

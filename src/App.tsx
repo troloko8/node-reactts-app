@@ -11,6 +11,7 @@ import LoginPageView from './components/main/autorization/login/LoginPageView'
 import { AuthProvider } from './components/global/useAuthContext'
 import ProfileView from './components/profile/ProfileView'
 import ProfileContentView from './components/profile/profileContent/ProfileContentView'
+import TourCreatorView from './components/profile/profileContent/subViews/toursManager/tourCreator/TourCreatorView'
 
 function App() {
     // front for tourRow and TourFull
@@ -45,6 +46,10 @@ function App() {
                                 <Route
                                     path="tours-manager"
                                     element={<ProfileContentView />}
+                                />
+                                <Route
+                                    path="tours-manager/create"
+                                    element={<TourCreatorView />}
                                 />
                                 <Route
                                     path="users-manager"

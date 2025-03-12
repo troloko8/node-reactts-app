@@ -2,6 +2,7 @@ import React from 'react'
 import { useLocation } from 'react-router-dom'
 import SettingsView from './subViews/SettingsView'
 import MyBookingView from './subViews/MyBookingView'
+import MyToursManagerView from './subViews/toursManager/MyToursManagerView'
 
 interface Props {}
 
@@ -32,7 +33,8 @@ const ProfileContentView: React.FC<Props> = (props) => {
                 return <div>/me/biling</div>
             }
             case '/me/tours-manager': {
-                return <div>/me/tours-manager</div>
+                // return <div>/me/tours-manager</div>
+                return <MyToursManagerView />
             }
             case '/me/users-manager': {
                 return <div>/me/users-manager</div>
