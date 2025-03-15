@@ -6,7 +6,7 @@ import styles from './SettingsView.module.css'
 import { ApiResponse, ApiService } from '../../../../services/APIService'
 import { withPreventDefault } from '../../../global/helpers'
 import { useMutation } from '@tanstack/react-query'
-import { InputBoxView } from '../../../global/components/InputBoxView'
+import { TextInputBoxView } from '../../../global/components/TextInputBoxView'
 
 const api = new ApiService()
 
@@ -97,7 +97,7 @@ const AccountView: React.FC<AccountProps> = React.memo(function account({
                 action=""
                 className={`${global.form} ${styles.settings__form}`}
             >
-                <InputBoxView
+                <TextInputBoxView
                     type="text"
                     value={name}
                     labelFor="name"
@@ -106,7 +106,7 @@ const AccountView: React.FC<AccountProps> = React.memo(function account({
                     isRequired={true}
                     setValue={nameHandler}
                 />
-                <InputBoxView
+                <TextInputBoxView
                     type="email"
                     value={email}
                     labelFor="email"
@@ -271,7 +271,7 @@ const PasswordView: React.FC<PasswordProps> = React.memo(function password({
                 action=""
                 className={`${global.form} ${styles.settings__form}`}
             >
-                <InputBoxView
+                <TextInputBoxView
                     type="password"
                     value={curPass}
                     labelFor="password-current"
@@ -282,7 +282,7 @@ const PasswordView: React.FC<PasswordProps> = React.memo(function password({
                     placeholder="***********"
                 />
 
-                <InputBoxView
+                <TextInputBoxView
                     type="password"
                     value={pass}
                     labelFor="password"
@@ -293,7 +293,7 @@ const PasswordView: React.FC<PasswordProps> = React.memo(function password({
                     placeholder="***********"
                 />
 
-                <InputBoxView
+                <TextInputBoxView
                     type="password"
                     value={confirmPass}
                     labelFor="password-confirm"

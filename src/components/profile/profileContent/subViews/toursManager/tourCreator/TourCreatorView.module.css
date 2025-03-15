@@ -13,3 +13,10 @@
 .guides__input {
     flex: 1;
 }
+
+.tourCreator__box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}

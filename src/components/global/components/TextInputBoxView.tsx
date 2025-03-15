@@ -14,7 +14,7 @@ export type InputType = {
     additionalClasses?: string
 }
 
-export const InputBoxView: React.FC<InputType> = ({
+export const TextInputBoxView: React.FC<InputType> = ({
     type,
     value,
     labelFor,
