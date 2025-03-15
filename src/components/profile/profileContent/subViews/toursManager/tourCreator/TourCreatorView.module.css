@@ -1,0 +1,15 @@
+.guides {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.guides__box {
+    display: flex;
+    gap: 1rem;
+    flex-flow: nowrap;
+}
+
+.guides__input {
+    flex: 1;
+}

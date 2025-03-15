@@ -11,6 +11,7 @@ export type InputType = {
     id?: string
     isRequired?: boolean
     placeholder?: string
+    additionalClasses?: string
 }
 
 export const InputBoxView: React.FC<InputType> = ({
@@ -22,9 +23,10 @@ export const InputBoxView: React.FC<InputType> = ({
     isRequired,
     setValue,
     placeholder = '',
+    additionalClasses = '',
 }) => {
     return (
-        <div className={global.form__input_box}>
+        <div className={`${global.form__input_box} ${additionalClasses}`}>
             <label htmlFor={labelFor} className={global.form__label}>
                 {labelTitle}
             </label>
