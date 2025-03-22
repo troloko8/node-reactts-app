@@ -8,6 +8,16 @@ import {
     TextAreaBoxView,
 } from '../../../../../global/components/TextAreaBoxView'
 import { NumberInputBoxView } from '../../../../../global/components/NumberInputBoxView'
+import {
+    DateInputBoxView,
+    extractDateString,
+    updateDate,
+} from '../../../../../global/components/DateInputBoxView'
+import {
+    extractTimeString,
+    TimeInputBoxView,
+    updateTime,
+} from '../../../../../global/components/TimeInputBoxView'
 
 interface Props {}
 
@@ -36,14 +46,14 @@ interface GuideItemViewProps {
 const initialState = {
     title: '',
     about: '',
-    imgCover: '',
     city: '',
     duration: '',
     difficulty: '',
     guides: [{ name: '', type: GuideTypes.GUIDE_LEAD }],
     dayAmount: 1,
     maxPeople: 1,
-    startDate: '',
+    startDate: new Date(),
+    imgCover: '',
     // images: '',
     // imageCover: '',
 }
@@ -72,7 +82,7 @@ type Action =
     | { type: 'guides'; value: GuideType[] }
     | { type: 'dayAmount'; value: number }
     | { type: 'maxPeople'; value: number }
-    | { type: 'startDate'; value: string }
+    | { type: 'startDate'; value: Date }
 
 enum DifficultyTypes {
     EASY = 'EASY',
@@ -139,7 +149,6 @@ const TourCreatorView: React.FC<Props> = (props) => {
                     />
 
                     <TextAreaBoxView
-                        // type="text"
                         value={tourReq.about}
                         labelFor="About"
                         labelTitle="About"
@@ -217,6 +226,38 @@ const TourCreatorView: React.FC<Props> = (props) => {
                         labelFor="Participants Amount"
                         labelTitle="Participants Amount"
                         id="participants_amount"
+                        isRequired={true}
+                    />
+
+                    <DateInputBoxView
+                        value={extractDateString(tourReq.startDate)}
+                        setValue={(value) => {
+                            const newDate = updateDate(tourReq.startDate, value)
+
+                            dispatch({
+                                type: 'startDate',
+                                value: newDate,
+                            })
+                        }}
+                        labelFor="start_date"
+                        labelTitle="Start Date"
+                        id="start_date"
+                        isRequired={true}
+                    />
+
+                    <TimeInputBoxView
+                        value={extractTimeString(tourReq.startDate)}
+                        setValue={(value) => {
+                            const newDate = updateTime(tourReq.startDate, value)
+
+                            dispatch({
+                                type: 'startDate',
+                                value: newDate,
+                            })
+                        }}
+                        labelFor="start_time"
+                        labelTitle="Start Time"
+                        id="start_time"
                         isRequired={true}
                     />
 
