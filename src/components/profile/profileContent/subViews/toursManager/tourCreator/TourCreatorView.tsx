@@ -18,6 +18,7 @@ import {
     TimeInputBoxView,
     updateTime,
 } from '../../../../../global/components/TimeInputBoxView'
+import MultiImgUploaderView from '../../../../../global/components/MultiImgUploaderView'
 
 interface Props {}
 
@@ -53,29 +54,13 @@ const initialState = {
     dayAmount: 1,
     maxPeople: 1,
     startDate: new Date(),
-    imgCover: '',
-    // images: '',
-    // imageCover: '',
+    imgCover: [],
+    images: [],
 }
-
-// Define a reducer function
-// type Action = { type: 'increment' } | { type: 'decrement' } | { type: 'reset' }
-// type Action = {
-//     type:
-//         | 'title'
-//         | 'about'
-//         | 'imgCover'
-//         | 'city'
-//         | 'duration'
-//         | 'difficulty'
-//         | 'guides'
-//     value: string | GuideType[]
-// }
 
 type Action =
     | { type: 'title'; value: string }
     | { type: 'about'; value: string }
-    | { type: 'imgCover'; value: string }
     | { type: 'city'; value: string }
     | { type: 'duration'; value: string }
     | { type: 'difficulty'; value: string }
@@ -83,33 +68,14 @@ type Action =
     | { type: 'dayAmount'; value: number }
     | { type: 'maxPeople'; value: number }
     | { type: 'startDate'; value: Date }
+    | { type: 'imgCover'; value: File[] }
+    | { type: 'images'; value: File[] }
 
 enum DifficultyTypes {
     EASY = 'EASY',
     MEDIUM = 'MEDIUM',
     HARD = 'HARD',
 }
-
-// function reducer(state: typeof initialState, action: Action) {
-//     switch (action.type) {
-//         case 'title':
-//             return { ...state, title: action.value }
-//         case 'about':
-//             return { ...state, about: action.value }
-//         case 'city':
-//             return { ...state, city: action.value }
-//         case 'duration':
-//             return { ...state, duration: action.value }
-//         case 'difficulty':
-//             return { ...state, difficulty: action.value }
-//         case 'guides':
-//             return { ...state, guides: action.value }
-//         case 'imgCover':
-//             return { ...state, imgCover: action.value }
-//         default:
-//             throw new Error('Unknown action type')
-//     }
-// }
 
 function reducer(state: typeof initialState, action: Action) {
     return {
@@ -262,6 +228,22 @@ const TourCreatorView: React.FC<Props> = (props) => {
                     />
 
                     <GuidesView guides={tourReq.guides} dispatch={dispatch} />
+
+                    <MultiImgUploaderView
+                        setPhotoFiles={(files) =>
+                            dispatch({ type: 'imgCover', value: files })
+                        }
+                        maxFiles={1}
+                        title="Cover Image"
+                    />
+
+                    <MultiImgUploaderView
+                        setPhotoFiles={(files) =>
+                            dispatch({ type: 'images', value: files })
+                        }
+                        maxFiles={3}
+                        title="Other photos"
+                    />
                 </div>
             </form>
         </div>
