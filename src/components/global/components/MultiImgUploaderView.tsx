@@ -15,6 +15,7 @@ const MultiImgUploaderView: React.FC<MultiImgUploaderViewProps> = ({
 }) => {
     const [imageSrcs, setImageSrcs] = useState<string[]>([])
     const [photoFilesState, setPhotoFilesState] = useState<File[]>([])
+    const randomLabelID = `photos-${Math.random().toString(36).substring(2, 9)}`
 
     useEffect(() => {
         setPhotoFiles(photoFilesState)
@@ -84,20 +85,22 @@ const MultiImgUploaderView: React.FC<MultiImgUploaderViewProps> = ({
                         </button>
                     </div>
                 ))}
+
                 <input
                     className={global.form__upload}
                     style={{ fontSize: 40 }}
                     type="file"
                     onChange={handleImageUpload}
                     accept="image/*"
-                    id="photos"
+                    id={randomLabelID}
+                    // Use the randomLabelID for the input's id
                     name="photos"
                     multiple // Allow multiple file selection
                     disabled={Boolean(
                         maxFiles && photoFilesState.length >= maxFiles,
                     )} // Disable input if maxFiles limit is reached
                 />
-                <label htmlFor="photos" className={global.btn_text}>
+                <label htmlFor={randomLabelID} className={global.btn_text}>
                     Choose new photos
                 </label>
             </div>
