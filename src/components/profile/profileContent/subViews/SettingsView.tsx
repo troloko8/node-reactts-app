@@ -7,14 +7,23 @@ import { ApiResponse, ApiService } from '../../../../services/APIService'
 import { withPreventDefault } from '../../../global/helpers'
 import { useMutation } from '@tanstack/react-query'
 import { TextInputBoxView } from '../../../global/components/TextInputBoxView'
+import { SelectBoxView } from '../../../global/components/TextAreaBoxView'
 
 const api = new ApiService()
 
 interface Props {}
 
+enum UserTypes {
+    USER = 'user',
+    ADMIN = 'admin',
+    GUIDE = 'guide',
+    LEAD_GUIDE = 'lead-guide',
+}
+
 const SettingsView: React.FC<Props> = (props) => {
     const [name, setName] = useState<string>('')
     const [email, setEmail] = useState<string>('')
+    const [userRole, setUserRole] = useState<UserTypes>(UserTypes.USER)
 
     const [curPass, setCurPass] = useState<string>('')
     const [pass, setPass] = useState<string>('')
@@ -22,7 +31,9 @@ const SettingsView: React.FC<Props> = (props) => {
 
     return (
         <div className={styles.settings}>
-            <AccountView {...{ name, email, setName, setEmail }} />
+            <AccountView
+                {...{ name, email, setName, setEmail, userRole, setUserRole }}
+            />
             <PasswordView
                 {...{
                     curPass,
@@ -47,15 +58,19 @@ const updateUser = async (user: FormData) => {
 type AccountProps = {
     name: string
     email: string
+    userRole: string
     setName: Dispatch<string>
     setEmail: Dispatch<string>
+    setUserRole: Dispatch<UserTypes>
 }
 
 const AccountView: React.FC<AccountProps> = React.memo(function account({
     name,
     email,
+    userRole,
     setName,
     setEmail,
+    setUserRole,
 }: AccountProps) {
     const { user } = useAuthContext()
 
@@ -64,6 +79,7 @@ const AccountView: React.FC<AccountProps> = React.memo(function account({
     useEffect(() => {
         setName(user?.name ?? '')
         setEmail(user?.email ?? '')
+        setUserRole((user?.role as UserTypes) ?? UserTypes.USER)
     }, [user])
 
     const userDataMutation = useMutation<ApiResponse<User>, Error, FormData>({
@@ -116,6 +132,21 @@ const AccountView: React.FC<AccountProps> = React.memo(function account({
                     setValue={emailHandler}
                 />
 
+                <SelectBoxView
+                    options={[
+                        { value: UserTypes.USER, label: 'User' },
+                        { value: UserTypes.GUIDE, label: 'Guide' },
+                        { value: UserTypes.LEAD_GUIDE, label: 'Lead Guide' },
+                        { value: UserTypes.ADMIN, label: 'Admin' },
+                    ]}
+                    value={userRole}
+                    setValue={(e) => setUserRole(e.target.value as UserTypes)}
+                    labelTitle="Choose a Your Role"
+                    labelFor="user-role"
+                    id="user-role"
+                    isRequired={true}
+                />
+
                 <ImgUploaderView setPhotoFile={setPhotoFile} />
 
                 <button
@@ -125,6 +156,7 @@ const AccountView: React.FC<AccountProps> = React.memo(function account({
                         const form = new FormData()
                         form.append('name', name)
                         form.append('email', email)
+                        form.append('role', userRole)
 
                         // Append photo only if valid
                         if (photoFile) {

@@ -1,3 +1,11 @@
+.tourCreator {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    gap: 2rem;
+}
+
 .guides {
     display: flex;
     flex-direction: column;

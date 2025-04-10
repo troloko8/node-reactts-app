@@ -19,6 +19,8 @@ import {
     updateTime,
 } from '../../../../../global/components/TimeInputBoxView'
 import MultiImgUploaderView from '../../../../../global/components/MultiImgUploaderView'
+import { ApiResponse, ApiService } from '../../../../../../services/APIService'
+import { useMutation } from '@tanstack/react-query'
 
 interface Props {}
 
@@ -43,39 +45,64 @@ interface GuideItemViewProps {
     guides: GuideType[]
 }
 
+enum DifficultyTypes {
+    EASY = 'easy',
+    MEDIUM = 'medium',
+    DIFFICULT = 'difficult',
+}
+
+type RawTourRequest = {
+    _id?: number
+    name: string
+    slug?: string
+    duration: number
+    maxGroupSize: number
+    difficulty: 'easy' | 'medium' | 'difficult'
+    ratingAverage?: number
+    ratingsQuantity?: number
+    price: number
+    priceDiscount?: number
+    summary: string
+    description?: string
+    imageCover: File[]
+    images: File[]
+    createdAt?: Date
+    startDates?: Date[]
+    secretTour?: boolean
+    startLocation?: Location
+    locations?: Location[]
+    guides?: number[]
+}
+
 // Define the initial state
-const initialState = {
-    title: '',
-    about: '',
-    city: '',
-    duration: '',
-    difficulty: '',
-    guides: [{ name: '', type: GuideTypes.GUIDE_LEAD }],
-    dayAmount: 1,
-    maxPeople: 1,
-    startDate: new Date(),
-    imgCover: [],
+const initialState: RawTourRequest = {
+    name: 'Some Title',
+    description: 'Some description',
+    summary: 'Some summary',
+    // city: '',
+    duration: 1,
+    difficulty: DifficultyTypes.EASY,
+    // guides: [{ name: '', type: GuideTypes.GUIDE_LEAD }], // TODO add to server
+    maxGroupSize: 1,
+    startDates: [new Date()],
+    imageCover: [],
     images: [],
+    price: 0,
 }
 
 type Action =
-    | { type: 'title'; value: string }
-    | { type: 'about'; value: string }
+    | { type: 'name'; value: string }
+    | { type: 'description'; value: string }
     | { type: 'city'; value: string }
-    | { type: 'duration'; value: string }
-    | { type: 'difficulty'; value: string }
+    | { type: 'duration'; value: number }
+    | { type: 'difficulty'; value: DifficultyTypes }
     | { type: 'guides'; value: GuideType[] }
-    | { type: 'dayAmount'; value: number }
-    | { type: 'maxPeople'; value: number }
-    | { type: 'startDate'; value: Date }
-    | { type: 'imgCover'; value: File[] }
+    | { type: 'maxGroupSize'; value: number }
+    | { type: 'startDates'; value: Date[] }
+    | { type: 'imageCover'; value: File[] }
     | { type: 'images'; value: File[] }
-
-enum DifficultyTypes {
-    EASY = 'EASY',
-    MEDIUM = 'MEDIUM',
-    HARD = 'HARD',
-}
+    | { type: 'price'; value: number }
+    | { type: 'summary'; value: string }
 
 function reducer(state: typeof initialState, action: Action) {
     return {
@@ -84,17 +111,45 @@ function reducer(state: typeof initialState, action: Action) {
     }
 }
 
+const api = new ApiService()
+// TODO add to server
+const createTour = async (rawTour: RawTourRequest) => {
+    // const res = await api.post<Tour>('/tours', tour)
+    // return res
+}
+
+const getUsers = async () => {
+    const res = await api.post<User[]>('/users', {
+        // params: { filterBy: { role: ['lead-guide', 'guide'] } },
+        data: {
+            filterBy: [{ role: ['lead-guide', 'guide'] }],
+        },
+    })
+    return res
+}
+
 const TourCreatorView: React.FC<Props> = (props) => {
     const [tourReq, dispatch] = useReducer(reducer, initialState)
 
-    console.log(tourReq)
+    const userDataMutation = useMutation<ApiResponse<User[]>, Error>({
+        // FIXME do filtration for lead lead-tema
+        // TODO add user selector from server
+        // TODO finished tour creator
+        mutationFn: getUsers,
+        onSuccess: (res) => {
+            console.log({ res })
+        },
+        onError: (error) => {
+            console.error('Logout failed:', error.message)
+        },
+    })
 
     useEffect(() => {
-        // dispatch({ type: 'title', value: 'sdasdsa' })
+        userDataMutation.mutate()
     }, [])
 
     return (
-        <div>
+        <div className={styles.tourCreator}>
             <h2
                 className={`${global.title_secondary} ${styles.tourCreator__title}`}
             >
@@ -104,28 +159,56 @@ const TourCreatorView: React.FC<Props> = (props) => {
                 <div className={styles.tourCreator__box}>
                     <TextInputBoxView
                         type="text"
-                        value={tourReq.title}
+                        value={tourReq.name}
                         labelFor="name"
                         labelTitle="Name"
                         id="name"
                         isRequired={true}
                         setValue={(e) =>
-                            dispatch({ type: 'title', value: e.target.value })
+                            dispatch({ type: 'name', value: e.target.value })
                         }
                     />
-
                     <TextAreaBoxView
-                        value={tourReq.about}
+                        value={tourReq.description ?? ''}
                         labelFor="About"
                         labelTitle="About"
                         id="About"
                         isRequired={true}
                         setValue={(e) =>
-                            dispatch({ type: 'about', value: e.target.value })
+                            dispatch({
+                                type: 'summary',
+                                value: e.target.value,
+                            })
                         }
                     />
-
-                    <TextInputBoxView
+                    <TextAreaBoxView
+                        value={tourReq.description ?? ''}
+                        labelFor="Description"
+                        labelTitle="Description"
+                        id="Description"
+                        isRequired={true}
+                        setValue={(e) =>
+                            dispatch({
+                                type: 'description',
+                                value: e.target.value,
+                            })
+                        }
+                    />
+                    <MultiImgUploaderView
+                        setPhotoFiles={(files) =>
+                            dispatch({ type: 'imageCover', value: files })
+                        }
+                        maxFiles={1}
+                        title="Cover Image"
+                    />
+                    <MultiImgUploaderView
+                        setPhotoFiles={(files) =>
+                            dispatch({ type: 'images', value: files })
+                        }
+                        maxFiles={3}
+                        title="Collage photos"
+                    />
+                    {/* <TextInputBoxView
                         type="text"
                         value={tourReq.city}
                         labelFor="City"
@@ -135,37 +218,18 @@ const TourCreatorView: React.FC<Props> = (props) => {
                         setValue={(e) =>
                             dispatch({ type: 'city', value: e.target.value })
                         }
-                    />
-
+                    /> */}
                     <SelectBoxView
                         options={[
                             { value: DifficultyTypes.EASY, label: 'Easy' },
                             { value: DifficultyTypes.MEDIUM, label: 'Medium' },
-                            { value: DifficultyTypes.HARD, label: 'Hard' },
+                            { value: DifficultyTypes.DIFFICULT, label: 'Hard' },
                         ]}
                         value={tourReq.difficulty}
                         setValue={(e) =>
                             dispatch({
                                 type: 'difficulty',
-                                value: e.target.value,
-                            })
-                        }
-                        labelTitle="Choose a difficulty"
-                        id="difficulty"
-                        isRequired={true}
-                    />
-
-                    <SelectBoxView
-                        options={[
-                            { value: DifficultyTypes.EASY, label: 'Easy' },
-                            { value: DifficultyTypes.MEDIUM, label: 'Medium' },
-                            { value: DifficultyTypes.HARD, label: 'Hard' },
-                        ]}
-                        value={tourReq.difficulty}
-                        setValue={(e) =>
-                            dispatch({
-                                type: 'difficulty',
-                                value: e.target.value,
+                                value: e.target.value as DifficultyTypes,
                             })
                         }
                         labelTitle="Choose a difficulty"
@@ -174,9 +238,9 @@ const TourCreatorView: React.FC<Props> = (props) => {
                     />
 
                     <NumberInputBoxView
-                        value={tourReq.dayAmount}
+                        value={tourReq.duration}
                         setValue={(value) =>
-                            dispatch({ type: 'dayAmount', value })
+                            dispatch({ type: 'duration', value })
                         }
                         labelFor="Day Amount"
                         labelTitle="Day Amount"
@@ -185,9 +249,9 @@ const TourCreatorView: React.FC<Props> = (props) => {
                     />
 
                     <NumberInputBoxView
-                        value={tourReq.maxPeople}
+                        value={tourReq.maxGroupSize}
                         setValue={(value) =>
-                            dispatch({ type: 'maxPeople', value })
+                            dispatch({ type: 'maxGroupSize', value })
                         }
                         labelFor="Participants Amount"
                         labelTitle="Participants Amount"
@@ -195,14 +259,21 @@ const TourCreatorView: React.FC<Props> = (props) => {
                         isRequired={true}
                     />
 
+                    {/* <GuidesView guides={tourReq.guides} dispatch={dispatch} /> */}
+
                     <DateInputBoxView
-                        value={extractDateString(tourReq.startDate)}
+                        value={extractDateString(
+                            tourReq.startDates?.[0] ?? new Date(),
+                        )}
                         setValue={(value) => {
-                            const newDate = updateDate(tourReq.startDate, value)
+                            const newDate = updateDate(
+                                tourReq.startDates?.[0] ?? new Date(),
+                                value,
+                            )
 
                             dispatch({
-                                type: 'startDate',
-                                value: newDate,
+                                type: 'startDates',
+                                value: [newDate],
                             })
                         }}
                         labelFor="start_date"
@@ -212,13 +283,18 @@ const TourCreatorView: React.FC<Props> = (props) => {
                     />
 
                     <TimeInputBoxView
-                        value={extractTimeString(tourReq.startDate)}
+                        value={extractTimeString(
+                            tourReq.startDates?.[0] ?? new Date(),
+                        )}
                         setValue={(value) => {
-                            const newDate = updateTime(tourReq.startDate, value)
+                            const newDate = updateTime(
+                                tourReq.startDates?.[0] ?? new Date(),
+                                value,
+                            )
 
                             dispatch({
-                                type: 'startDate',
-                                value: newDate,
+                                type: 'startDates',
+                                value: [newDate],
                             })
                         }}
                         labelFor="start_time"
@@ -227,26 +303,31 @@ const TourCreatorView: React.FC<Props> = (props) => {
                         isRequired={true}
                     />
 
-                    <GuidesView guides={tourReq.guides} dispatch={dispatch} />
-
-                    <MultiImgUploaderView
-                        setPhotoFiles={(files) =>
-                            dispatch({ type: 'imgCover', value: files })
-                        }
-                        maxFiles={1}
-                        title="Cover Image"
+                    <NumberInputBoxView
+                        value={tourReq.maxGroupSize}
+                        setValue={(value) => dispatch({ type: 'price', value })}
+                        labelFor="Price"
+                        labelTitle="Price"
+                        id="price"
+                        isRequired={true}
                     />
 
-                    <MultiImgUploaderView
-                        setPhotoFiles={(files) =>
-                            dispatch({ type: 'images', value: files })
-                        }
-                        maxFiles={3}
-                        title="Other photos"
-                    />
+                    <CreateBtn {...tourReq} />
                 </div>
             </form>
         </div>
+    )
+}
+
+const CreateBtn = (tourReq: RawTourRequest) => {
+    return (
+        <button
+            className={`${global.btn} ${global.btn__small} ${global.btn__green}`}
+            style={{ marginRight: 'auto' }}
+            onClick={() => createTour(tourReq)}
+        >
+            Create Tour
+        </button>
     )
 }
 

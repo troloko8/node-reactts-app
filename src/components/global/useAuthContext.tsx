@@ -96,9 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const logOutMutation = useMutation<User, Error>({
         mutationFn: fetchUserLogOut,
-        onSuccess: (user) => {
-            console.log({ user })
-
+        onSuccess: () => {
             setIsAuth(false)
             setUser(undefined)
             setError(undefined)

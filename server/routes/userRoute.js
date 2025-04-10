@@ -45,7 +45,7 @@ router.get('/myTours', getMyTours)
 
 router.use(restrictToByRole('admin'))
 
-router.route('/').get(getAllUsers).post(createUser)
+router.route('/').get(getAllUsers).post(getAllUsers).post(createUser)
 
 router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser)
 

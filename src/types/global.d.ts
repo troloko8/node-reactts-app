@@ -77,3 +77,34 @@ type UserReq = {
     name?: string
     email?: string
 }
+
+interface Location {
+    type: 'Point'
+    coordinates: number[]
+    address: string
+    description: string
+    day?: number // Only for locations array
+}
+
+interface TourRequest {
+    _id?: Types.ObjectId
+    name: string
+    slug?: string
+    duration: number
+    maxGroupSize: number
+    difficulty: 'easy' | 'medium' | 'difficult'
+    ratingAverage?: number
+    ratingsQuantity?: number
+    price: number
+    priceDiscount?: number
+    summary: string
+    description?: string
+    imageCover: string
+    images?: string[]
+    createdAt?: Date
+    startDates?: Date[]
+    secretTour?: boolean
+    startLocation?: Location
+    locations?: Location[]
+    guides?: Types.ObjectId[] // populated or unpopulated IDs
+}

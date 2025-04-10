@@ -75,7 +75,20 @@ exports.getAll = (Model) =>
     catchAsync(async (req, res, next) => {
         // to allow for nested GET revies on tour(hack)
         let filter = {}
-        if (req.params.tourID) filter = { tour: req.params.tourID }
+        if (req.params.tourID) {
+            filter = { tour: req.params.tourID }
+        } else if (req.body?.data?.filterBy) {
+            const filters = req.body?.data?.filterBy
+            const mongoQuery = {}
+
+            filters.forEach((filter) => {
+                console.log('HERE2')
+                const key = Object.keys(filter)[0]
+                mongoQuery[key] = { $in: filter[key] }
+            })
+
+            filter = { ...filter, ...mongoQuery }
+        }
 
         // EXECUTE A QUERY
         const features = new APIFeatures(Model.find(filter), req.query)
