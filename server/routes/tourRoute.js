@@ -13,6 +13,7 @@ const {
     getDistances,
     uploadTourImages,
     resizeTourImages,
+    saveToursImages,
 } = require(`./../controllers/tourController.js`)
 const { protect, restrictToByRole } = require(
     `./../controllers/authController.js`,
@@ -46,10 +47,15 @@ router
 
 router.route('/distance/latlng/:latlng/unit/:unit').get(getDistances)
 
-router
-    .route('/')
-    .get(getAlltours)
-    .post(protect, restrictToByRole('admin', 'lead-guide'), createTour)
+//FIXME FINISHED
+router.route('/').get(getAlltours).post(
+    protect,
+    restrictToByRole('admin', 'lead-guide'),
+    // uploadTourImages,
+    saveToursImages,
+    createTour,
+)
+// TODO .put / putch
 
 // app.get('/api/v1/tours', getAlltours)
 // app.post('/api/v1/tours', createTour)

@@ -1,12 +1,10 @@
 import React, { useEffect, useReducer } from 'react'
+import sharp from 'sharp'
 
 import global from './../../../../../global/global.module.css'
 import styles from './TourCreatorView.module.css'
 import { TextInputBoxView } from '../../../../../global/components/TextInputBoxView'
-import {
-    SelectBoxView,
-    TextAreaBoxView,
-} from '../../../../../global/components/TextAreaBoxView'
+import { TextAreaBoxView } from '../../../../../global/components/TextAreaBoxView'
 import { NumberInputBoxView } from '../../../../../global/components/NumberInputBoxView'
 import {
     DateInputBoxView,
@@ -19,30 +17,23 @@ import {
     updateTime,
 } from '../../../../../global/components/TimeInputBoxView'
 import MultiImgUploaderView from '../../../../../global/components/MultiImgUploaderView'
-import { ApiResponse, ApiService } from '../../../../../../services/APIService'
-import { useMutation } from '@tanstack/react-query'
+import { ApiService } from '../../../../../../services/APIService'
+import { useQuery } from '@tanstack/react-query'
+import { withPreventDefault } from '../../../../../global/helpers'
+import { SelectBoxView } from '../../../../../global/components/SelectBoxView'
 
 interface Props {}
 
-enum GuideTypes {
-    GUIDE = 'GUIDE',
-    GUIDE_LEAD = 'GUIDE_LEAD',
-}
-
-interface GuideType {
-    name: string
-    type: GuideTypes
-}
-
 interface GuidesViewType {
-    guides: GuideType[]
+    guides: User[]
+    guidesPull: User[]
     dispatch: React.Dispatch<Action>
 }
 interface GuideItemViewProps {
-    guide: GuideType
+    guide: User
     index: number
     dispatch: React.Dispatch<Action>
-    guides: GuideType[]
+    guides: User[]
 }
 
 enum DifficultyTypes {
@@ -64,14 +55,14 @@ type RawTourRequest = {
     priceDiscount?: number
     summary: string
     description?: string
-    imageCover: File[]
-    images: File[]
+    imageCover: string[]
+    images: string[]
     createdAt?: Date
     startDates?: Date[]
     secretTour?: boolean
     startLocation?: Location
     locations?: Location[]
-    guides?: number[]
+    guides?: User[]
 }
 
 // Define the initial state
@@ -82,12 +73,13 @@ const initialState: RawTourRequest = {
     // city: '',
     duration: 1,
     difficulty: DifficultyTypes.EASY,
-    // guides: [{ name: '', type: GuideTypes.GUIDE_LEAD }], // TODO add to server
+    guides: [],
+    // TODO add to server
     maxGroupSize: 1,
     startDates: [new Date()],
     imageCover: [],
     images: [],
-    price: 0,
+    price: 1,
 }
 
 type Action =
@@ -96,11 +88,11 @@ type Action =
     | { type: 'city'; value: string }
     | { type: 'duration'; value: number }
     | { type: 'difficulty'; value: DifficultyTypes }
-    | { type: 'guides'; value: GuideType[] }
+    | { type: 'guides'; value: User[] }
     | { type: 'maxGroupSize'; value: number }
     | { type: 'startDates'; value: Date[] }
-    | { type: 'imageCover'; value: File[] }
-    | { type: 'images'; value: File[] }
+    | { type: 'imageCover'; value: string[] }
+    | { type: 'images'; value: string[] }
     | { type: 'price'; value: number }
     | { type: 'summary'; value: string }
 
@@ -114,39 +106,36 @@ function reducer(state: typeof initialState, action: Action) {
 const api = new ApiService()
 // TODO add to server
 const createTour = async (rawTour: RawTourRequest) => {
-    // const res = await api.post<Tour>('/tours', tour)
-    // return res
+    const res = await api.post<Tour>('/tours', rawTour)
+    return res
 }
 
-const getUsers = async () => {
-    const res = await api.post<User[]>('/users', {
-        // params: { filterBy: { role: ['lead-guide', 'guide'] } },
+const getGuideList = async (): Promise<User[]> => {
+    const res = await api.post<User[]>('users', {
         data: {
             filterBy: [{ role: ['lead-guide', 'guide'] }],
         },
     })
-    return res
+
+    return res.data
 }
 
 const TourCreatorView: React.FC<Props> = (props) => {
     const [tourReq, dispatch] = useReducer(reducer, initialState)
 
-    const userDataMutation = useMutation<ApiResponse<User[]>, Error>({
-        // FIXME do filtration for lead lead-tema
-        // TODO add user selector from server
-        // TODO finished tour creator
-        mutationFn: getUsers,
-        onSuccess: (res) => {
-            console.log({ res })
-        },
-        onError: (error) => {
-            console.error('Logout failed:', error.message)
-        },
+    const { data: guideUsersCached } = useQuery<User[]>({
+        queryKey: ['guideUsers'],
     })
 
-    useEffect(() => {
-        userDataMutation.mutate()
-    }, [])
+    const {
+        data: guideUsers,
+        error,
+        isLoading,
+    } = useQuery<User[]>({
+        queryKey: ['guideUsers'],
+        queryFn: getGuideList,
+        enabled: !!guideUsersCached,
+    })
 
     return (
         <div className={styles.tourCreator}>
@@ -195,14 +184,14 @@ const TourCreatorView: React.FC<Props> = (props) => {
                         }
                     />
                     <MultiImgUploaderView
-                        setPhotoFiles={(files) =>
+                        setPhotoFiles={async (files) =>
                             dispatch({ type: 'imageCover', value: files })
                         }
                         maxFiles={1}
                         title="Cover Image"
                     />
                     <MultiImgUploaderView
-                        setPhotoFiles={(files) =>
+                        setPhotoFiles={async (files) =>
                             dispatch({ type: 'images', value: files })
                         }
                         maxFiles={3}
@@ -260,6 +249,11 @@ const TourCreatorView: React.FC<Props> = (props) => {
                     />
 
                     {/* <GuidesView guides={tourReq.guides} dispatch={dispatch} /> */}
+                    <GuidesView
+                        guides={tourReq.guides ?? []}
+                        guidesPull={guideUsers ?? []}
+                        dispatch={dispatch}
+                    />
 
                     <DateInputBoxView
                         value={extractDateString(
@@ -304,7 +298,7 @@ const TourCreatorView: React.FC<Props> = (props) => {
                     />
 
                     <NumberInputBoxView
-                        value={tourReq.maxGroupSize}
+                        value={tourReq.price}
                         setValue={(value) => dispatch({ type: 'price', value })}
                         labelFor="Price"
                         labelTitle="Price"
@@ -324,23 +318,46 @@ const CreateBtn = (tourReq: RawTourRequest) => {
         <button
             className={`${global.btn} ${global.btn__small} ${global.btn__green}`}
             style={{ marginRight: 'auto' }}
-            onClick={() => createTour(tourReq)}
+            onClick={withPreventDefault(() => createTour(tourReq))}
         >
             Create Tour
         </button>
     )
 }
 
-const GuidesView = ({ guides, dispatch }: GuidesViewType) => {
+const GuidesView = ({ guides, guidesPull, dispatch }: GuidesViewType) => {
     return (
         <div className={styles.guides}>
             <h3 className={global.title_third}>Guides</h3>
+
+            <SelectBoxView
+                options={[
+                    { name: 'Select', role: 'a guide' },
+                    ...guidesPull,
+                ].map((guide) => {
+                    return {
+                        value: JSON.stringify(guide),
+                        label: `${guide.name} - ${guide.role ?? 'Unknwon'}`,
+                    }
+                })}
+                value={guides[guides.length - 1]?.name ?? ''}
+                setValue={(e) => {
+                    console.log('res: ', JSON.parse(e.target.value))
+                    dispatch({
+                        type: 'guides',
+                        value: [...guides, JSON.parse(e.target.value)],
+                    })
+                }}
+                labelTitle="Choose a Guide"
+                id="guides"
+                isRequired={true}
+            />
 
             {guides.map((guide, index) => {
                 return GuideItemView({ guide, dispatch, index, guides })
             })}
 
-            <button
+            {/* <button
                 className={`${global.btn} ${global.btn__small} ${global.btn__green}`}
                 style={{ marginRight: 'auto' }}
                 onClick={() =>
@@ -354,7 +371,7 @@ const GuidesView = ({ guides, dispatch }: GuidesViewType) => {
                 }
             >
                 Add Guide
-            </button>
+            </button> */}
         </div>
     )
 }
@@ -367,69 +384,23 @@ const GuideItemView: React.FC<GuideItemViewProps> = ({
 }) => {
     return (
         <div key={index} className={styles.guides__box}>
-            <TextInputBoxView
-                type="text"
-                value={guide.name}
-                labelFor={`guide-name-${index}`}
-                labelTitle="Name of the guide"
-                id={`guide-name-${index}`}
-                isRequired={true}
-                setValue={(e) =>
-                    dispatch({
-                        type: 'guides',
-                        value: guides.map((guide, i) =>
-                            i === index
-                                ? { ...guide, name: e.target.value }
-                                : guide,
-                        ),
-                    })
-                }
-                additionalClasses={styles.guides__input}
-            />
-
-            <SelectBoxView
-                options={[
-                    { value: GuideTypes.GUIDE, label: 'Guide' },
-                    {
-                        value: GuideTypes.GUIDE_LEAD,
-                        label: 'Guide Lead',
-                    },
-                ]}
-                value={guide.type}
-                setValue={(e) =>
-                    dispatch({
-                        type: 'guides',
-                        value: guides.map((guide, i) =>
-                            i === index
-                                ? {
-                                      ...guide,
-                                      type: e.target.value as GuideTypes,
-                                  }
-                                : guide,
-                        ),
-                    })
-                }
-                labelTitle="Choose a difficulty"
-                id="difficulty"
-                isRequired={true}
-            />
+            <p className={styles.guideInfo}>
+                {guide.name} - {guide.role ?? 'Unknown'}
+            </p>
 
             <button
                 className={`${global.btn} ${global.btn__small} ${global.btn__green}`}
                 style={{
                     background: 'red',
-                    margin: 'auto',
+                    // margin: 'auto',
                     marginBottom: '10px',
                 }}
-                onClick={() =>
+                onClick={withPreventDefault(() =>
                     dispatch({
                         type: 'guides',
-                        value: [
-                            ...guides.filter((_, i) => i !== index),
-                            // { name: '', type: GuideTypes.GUIDE },
-                        ],
-                    })
-                }
+                        value: [...guides.filter((_, i) => i !== index)],
+                    }),
+                )}
             >
                 Delete
             </button>

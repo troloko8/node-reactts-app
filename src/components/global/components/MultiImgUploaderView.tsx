@@ -3,7 +3,7 @@ import styles from './MultiImgUploaderView.module.css'
 import global from '../global.module.css'
 
 export type MultiImgUploaderViewProps = {
-    setPhotoFiles: (files: File[]) => void
+    setPhotoFiles: (files: string[]) => void
     title?: string
     maxFiles?: number // Optional parameter to limit the number of files
 }
@@ -18,8 +18,8 @@ const MultiImgUploaderView: React.FC<MultiImgUploaderViewProps> = ({
     const randomLabelID = `photos-${Math.random().toString(36).substring(2, 9)}`
 
     useEffect(() => {
-        setPhotoFiles(photoFilesState)
-    }, [photoFilesState])
+        setPhotoFiles(imageSrcs)
+    }, [imageSrcs])
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files || []) // Get all selected files

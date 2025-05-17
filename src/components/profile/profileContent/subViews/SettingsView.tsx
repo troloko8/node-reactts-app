@@ -7,7 +7,7 @@ import { ApiResponse, ApiService } from '../../../../services/APIService'
 import { withPreventDefault } from '../../../global/helpers'
 import { useMutation } from '@tanstack/react-query'
 import { TextInputBoxView } from '../../../global/components/TextInputBoxView'
-import { SelectBoxView } from '../../../global/components/TextAreaBoxView'
+import { SelectBoxView } from '../../../global/components/SelectBoxView'
 
 const api = new ApiService()
 

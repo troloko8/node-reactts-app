@@ -4,6 +4,8 @@ const Tour = require('../models/tourModels')
 const AppError = require('../utils/AppError')
 const catchAsync = require('../utils/catchAsync')
 const factory = require('./handlerFactory')
+const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3')
+const { Buffer } = require('buffer')
 
 // const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`))
 
@@ -37,11 +39,95 @@ exports.uploadTourImages = upload.fields([
     { name: 'imageCover', maxCount: 1 },
     { name: 'images', maxCount: 3 },
 ])
-
 // as example
 // upload.single('image') // - req.file
 // upload.array('images', 5) // - req.files
 
+const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+})
+
+exports.saveToursImages = catchAsync(async (req, res, next) => {
+    //FIXME do that it will be real async procces
+
+    await saveCoverImage(req, res, next)
+    await saveImages(req, res, next)
+
+    next()
+})
+
+const saveCoverImage = catchAsync(async (req, res, next) => {
+    const { imageCover, name } = req.body
+
+    if (!imageCover.length || !name || !req.user?._id) return next()
+    const image = imageCover?.[0]
+    const [, data] = image.split(',')
+    if (!data) {
+        throw new Error('Некорректный формат Base64 для imageCover')
+    }
+    const bufCover = Buffer.from(data, 'base64')
+    const folderName = 'TourCovers'
+    const fileKey = `${folderName}/tour-${req.body.name.replace(/\s+/g, '')}-user-${req.user._id}.jpeg`
+
+    const command = new PutObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: fileKey, // Filename in the bucket
+        Body: bufCover, // Processed image buffer
+        ContentType: 'image/jpeg', // Specify the content type
+    })
+
+    await s3.send(command)
+
+    const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`
+
+    req.body.imageCover = imageUrl
+})
+
+const saveImages = catchAsync(async (req, res, next) => {
+    const { images, name } = req.body
+
+    if (!images.length || !name || !req.user?._id) return next()
+    const imagesBuffer = images.map((image) => {
+        const [, data] = image.split(',')
+
+        if (!data) {
+            throw new Error('Некорректный формат Base64 для imageCover')
+        }
+        const bufCover = Buffer.from(data, 'base64')
+
+        return bufCover
+    })
+
+    const folderName = 'TourImages'
+    const imageUrlTemplate = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/`
+    const imageUrls = []
+
+    await Promise.all(
+        imagesBuffer.map((buffer, index) => {
+            console.log('buffer: ', buffer)
+            const fileKey = `${folderName}/tour-${req.body.name.replace(/\s+/g, '')}-user-${req.user._id}-image_${index + 1}.jpeg`
+            const command = new PutObjectCommand({
+                Bucket: process.env.AWS_S3_BUCKET_NAME,
+                Key: fileKey,
+                Body: buffer,
+                // Body: imagesBuffer,
+                ContentType: 'image/jpeg',
+            })
+
+            imageUrls.push(imageUrlTemplate + fileKey)
+
+            return s3.send(command)
+        }),
+    )
+
+    req.body.images = imageUrls
+})
+
+//OLD CODE WITHOUT S3
 exports.resizeTourImages = catchAsync(async (req, res, next) => {
     if (!req.files?.images || !req.files?.imageCover) return next()
 

@@ -1,3 +1,4 @@
+const { console } = require('inspector')
 const AppError = require('../utils/AppError')
 const APIFeatures = require('../utils/apiFeatures')
 const catchAsync = require('../utils/catchAsync')
@@ -42,6 +43,7 @@ exports.updateOne = (Model) =>
 
 exports.createOne = (Model) =>
     catchAsync(async (req, res, next) => {
+        console.log('_____HERE_____', req.body)
         const doc = await Model.create(req.body)
 
         res.status(201).json({

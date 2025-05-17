@@ -8,10 +8,7 @@ import { ApiService } from '../../../services/APIService'
 
 const api = new ApiService()
 const getTours = async (): Promise<Tour[]> => {
-    // const { data } = await api.get<Tour[]>('tours', {
-    const { data } = await api.get<Tour[]>('tours', {
-        // params: { page: 1, limit: 2 },
-    })
+    const { data } = await api.get<Tour[]>('tours', {})
 
     return data
 }
