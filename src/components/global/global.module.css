@@ -294,3 +294,15 @@
     outline: 3px solid #55c57a;
     outline-offset: 3px;
 }
+
+.error_message {
+    color: #ff7730;
+    font-size: 1.4rem;
+    margin-top: 0.5rem;
+}
+.error_message--success {
+    color: #55c57a;
+}
+.error_message--error {
+    color: #ff7730;
+}

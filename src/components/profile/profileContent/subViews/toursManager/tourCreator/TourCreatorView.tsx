@@ -1,5 +1,4 @@
-import React, { useEffect, useReducer } from 'react'
-import sharp from 'sharp'
+import React, { useReducer } from 'react'
 
 import global from './../../../../../global/global.module.css'
 import styles from './TourCreatorView.module.css'
@@ -74,7 +73,6 @@ const initialState: RawTourRequest = {
     duration: 1,
     difficulty: DifficultyTypes.EASY,
     guides: [],
-    // TODO add to server
     maxGroupSize: 1,
     startDates: [new Date()],
     imageCover: [],
@@ -96,6 +94,91 @@ type Action =
     | { type: 'price'; value: number }
     | { type: 'summary'; value: string }
 
+type TourInput = {
+    name: string
+    duration: number
+    maxGroupSize: number
+    difficulty: string
+    ratingAverage?: number
+    price: number
+    priceDiscount?: number
+    summary: string
+    imageCover: string
+}
+// TODO add validation for all fields
+function validateTour(input: RawTourRequest): string[] {
+    const errors: string[] = []
+
+    // name
+    if (!input.name) {
+        errors.push('A tour must have a name')
+    } else {
+        if (input.name.trim().length < 10) {
+            errors.push(
+                'A tour name must have more or equal then 10 characters',
+            )
+        }
+        if (input.name.trim().length > 40) {
+            errors.push(
+                'A tour name must have less or equal then 40 characters',
+            )
+        }
+    }
+
+    // duration
+    if (input.duration === undefined || input.duration === null) {
+        errors.push('A tour must have a duration')
+    }
+
+    // maxGroupSize
+    if (input.maxGroupSize === undefined || input.maxGroupSize === null) {
+        errors.push('A tour must have a grop size')
+    }
+
+    // difficulty
+    const allowedDifficulties = ['easy', 'medium', 'difficult']
+    if (!input.difficulty) {
+        errors.push('A tour must have a diffucalty')
+    } else if (!allowedDifficulties.includes(input.difficulty)) {
+        errors.push('Dufficulty is eather easy, medium, difficulty')
+    }
+
+    // ratingAverage
+    if (input.ratingAverage !== undefined) {
+        if (input.ratingAverage < 1) {
+            errors.push('A rating must be above 1.0')
+        }
+        if (input.ratingAverage > 5) {
+            errors.push('A rating must be below 5.0')
+        }
+    }
+
+    // price
+    if (input.price === undefined || input.price === null) {
+        errors.push('A tour must have a price')
+    }
+
+    // priceDiscount
+    if (
+        input.priceDiscount !== undefined &&
+        input.priceDiscount >= input.price
+    ) {
+        errors.push('dicountPrice: should be less then price')
+    }
+
+    // summary
+    if (!input.summary) {
+        errors.push('A tour must have a description')
+    }
+
+    // imageCover
+    if (!input.imageCover) {
+        errors.push('A tour must have a cover image')
+    }
+
+    return errors
+}
+
 function reducer(state: typeof initialState, action: Action) {
     return {
         ...state,
@@ -104,7 +187,6 @@ function reducer(state: typeof initialState, action: Action) {
 }
 
 const api = new ApiService()
-// TODO add to server
 const createTour = async (rawTour: RawTourRequest) => {
     const res = await api.post<Tour>('/tours', rawTour)
     return res
@@ -122,6 +204,7 @@ const getGuideList = async (): Promise<User[]> => {
 
 const TourCreatorView: React.FC<Props> = (props) => {
     const [tourReq, dispatch] = useReducer(reducer, initialState)
+    const [tourError, setTourError] = React.useState<string[]>([])
 
     const { data: guideUsersCached } = useQuery<User[]>({
         queryKey: ['guideUsers'],
@@ -197,17 +280,6 @@ const TourCreatorView: React.FC<Props> = (props) => {
                         maxFiles={3}
                         title="Collage photos"
                     />
-                    {/* <TextInputBoxView
-                        type="text"
-                        value={tourReq.city}
-                        labelFor="City"
-                        labelTitle="City"
-                        id="City"
-                        isRequired={true}
-                        setValue={(e) =>
-                            dispatch({ type: 'city', value: e.target.value })
-                        }
-                    /> */}
                     <SelectBoxView
                         options={[
                             { value: DifficultyTypes.EASY, label: 'Easy' },
@@ -306,19 +378,39 @@ const TourCreatorView: React.FC<Props> = (props) => {
                         isRequired={true}
                     />
 
-                    <CreateBtn {...tourReq} />
+                    {tourError.length > 0 && (
+                        <p className={global.error_message}>
+                            {tourError.map((err) => (
+                                <span key={err}>{err}</span>
+                            ))}
+                        </p>
+                    )}
+
+                    <CreateBtn tourReq={tourReq} setTourError={setTourError} />
                 </div>
             </form>
         </div>
     )
 }
 
-const CreateBtn = (tourReq: RawTourRequest) => {
+const CreateBtn: React.FC<{
+    tourReq: RawTourRequest
+    setTourError: React.Dispatch<React.SetStateAction<string[]>>
+}> = ({ tourReq, setTourError }) => {
     return (
         <button
             className={`${global.btn} ${global.btn__small} ${global.btn__green}`}
             style={{ marginRight: 'auto' }}
-            onClick={withPreventDefault(() => createTour(tourReq))}
+            onClick={withPreventDefault(() => {
+                const erros = validateTour(tourReq)
+                setTourError(erros)
+
+                if (erros.length == 0) {
+                    createTour(tourReq)
+
+                    console.log('erros: ', erros)
+                }
+            })}
         >
             Create Tour
         </button>
@@ -356,22 +448,6 @@ const GuidesView = ({ guides, guidesPull, dispatch }: GuidesViewType) => {
             {guides.map((guide, index) => {
                 return GuideItemView({ guide, dispatch, index, guides })
             })}
-
-            {/* <button
-                className={`${global.btn} ${global.btn__small} ${global.btn__green}`}
-                style={{ marginRight: 'auto' }}
-                onClick={() =>
-                    dispatch({
-                        type: 'guides',
-                        value: [
-                            ...guides,
-                            { name: '', type: GuideTypes.GUIDE },
-                        ],
-                    })
-                }
-            >
-                Add Guide
-            </button> */}
         </div>
     )
 }
