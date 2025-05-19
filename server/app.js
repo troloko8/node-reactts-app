@@ -74,9 +74,9 @@ app.post(
 
 // Body parser, reading data from body into req.body
 // app.use(express.json({ limit: '10kb' })) // body size limiter
-app.use(express.json({ limit: '1mb' })) // body size limiter
+app.use(express.json({ limit: '50mb' })) // body size limiter
 // app.use(express.urlencoded({ extended: true, limit: '10kb' })) // decoded data from form inputs
-app.use(express.urlencoded({ extended: true, limit: '1mb' })) // decoded data from form inputs
+app.use(express.urlencoded({ extended: true, limit: '50mb' })) // decoded data from form inputs
 app.use(cookieParser()) // parses cookies from the cookies in brouser
 
 // DATA sanitization against NoSQL query injection

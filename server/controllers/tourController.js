@@ -51,16 +51,7 @@ const s3 = new S3Client({
     },
 })
 
-exports.saveToursImages = catchAsync(async (req, res, next) => {
-    //FIXME do that it will be real async procces
-
-    await saveCoverImage(req, res, next)
-    await saveImages(req, res, next)
-
-    next()
-})
-
-const saveCoverImage = catchAsync(async (req, res, next) => {
+exports.saveCoverImage = catchAsync(async (req, res, next) => {
     const { imageCover, name } = req.body
 
     if (!imageCover.length || !name || !req.user?._id) return next()
@@ -85,9 +76,11 @@ const saveCoverImage = catchAsync(async (req, res, next) => {
     const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`
 
     req.body.imageCover = imageUrl
+
+    next()
 })
 
-const saveImages = catchAsync(async (req, res, next) => {
+exports.saveImages = catchAsync(async (req, res, next) => {
     const { images, name } = req.body
 
     if (!images.length || !name || !req.user?._id) return next()
@@ -108,7 +101,6 @@ const saveImages = catchAsync(async (req, res, next) => {
 
     await Promise.all(
         imagesBuffer.map((buffer, index) => {
-            console.log('buffer: ', buffer)
             const fileKey = `${folderName}/tour-${req.body.name.replace(/\s+/g, '')}-user-${req.user._id}-image_${index + 1}.jpeg`
             const command = new PutObjectCommand({
                 Bucket: process.env.AWS_S3_BUCKET_NAME,
@@ -125,6 +117,8 @@ const saveImages = catchAsync(async (req, res, next) => {
     )
 
     req.body.images = imageUrls
+
+    next()
 })
 
 //OLD CODE WITHOUT S3
