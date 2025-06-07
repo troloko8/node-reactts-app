@@ -94,18 +94,6 @@ type Action =
     | { type: 'price'; value: number }
     | { type: 'summary'; value: string }
 
-type TourInput = {
-    name: string
-    duration: number
-    maxGroupSize: number
-    difficulty: string
-    ratingAverage?: number
-    price: number
-    priceDiscount?: number
-    summary: string
-    imageCover: string
-}
-// TODO add validation for all fields
 function validateTour(input: RawTourRequest): string[] {
     const errors: string[] = []
 

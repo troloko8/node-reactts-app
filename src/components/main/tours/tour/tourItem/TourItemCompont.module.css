@@ -16,6 +16,7 @@
     flex-direction: column;
     max-width: 500px;
     justify-self: center;
+    width: 100%;
 }
 
 .card__header {
