@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react'
+import React, { useEffect, useReducer } from 'react'
 
 import global from './../../../../../global/global.module.css'
 import styles from './TourCreatorView.module.css'
@@ -17,7 +17,7 @@ import {
 } from '../../../../../global/components/TimeInputBoxView'
 import MultiImgUploaderView from '../../../../../global/components/MultiImgUploaderView'
 import { ApiService } from '../../../../../../services/APIService'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { withPreventDefault } from '../../../../../global/helpers'
 import { SelectBoxView } from '../../../../../global/components/SelectBoxView'
 
@@ -47,7 +47,7 @@ type RawTourRequest = {
     slug?: string
     duration: number
     maxGroupSize: number
-    difficulty: 'easy' | 'medium' | 'difficult'
+    difficulty: DifficultyTypes
     ratingAverage?: number
     ratingsQuantity?: number
     price: number
@@ -58,7 +58,7 @@ type RawTourRequest = {
     images: string[]
     createdAt?: Date
     startDates?: Date[]
-    secretTour?: boolean
+    // secretTour?: boolean
     startLocation?: Location
     locations?: Location[]
     guides?: User[]
@@ -66,7 +66,7 @@ type RawTourRequest = {
 
 // Define the initial state
 const initialState: RawTourRequest = {
-    name: 'Some Title',
+    name: '',
     description: 'Some description',
     summary: 'Some summary',
     // city: '',
@@ -109,6 +109,7 @@ type TourInput = {
 function validateTour(input: RawTourRequest): string[] {
     const errors: string[] = []
 
+    // debugger
     // name
     if (!input.name) {
         errors.push('A tour must have a name')
@@ -133,14 +134,15 @@ function validateTour(input: RawTourRequest): string[] {
     // maxGroupSize
     if (input.maxGroupSize === undefined || input.maxGroupSize === null) {
         errors.push('A tour must have a grop size')
+    } else if (input.maxGroupSize < 1) {
+        errors.push('A tour must have a grop size above 1')
+    } else if (input.maxGroupSize > 100) {
+        errors.push('A tour must have a grop size below 100')
     }
 
     // difficulty
-    const allowedDifficulties = ['easy', 'medium', 'difficult']
     if (!input.difficulty) {
         errors.push('A tour must have a diffucalty')
-    } else if (!allowedDifficulties.includes(input.difficulty)) {
-        errors.push('Dufficulty is eather easy, medium, difficulty')
     }
 
     // ratingAverage
@@ -156,6 +158,8 @@ function validateTour(input: RawTourRequest): string[] {
     // price
     if (input.price === undefined || input.price === null) {
         errors.push('A tour must have a price')
+    } else if (input.price < 1) {
+        errors.push('A tour must have a price above 1')
     }
 
     // priceDiscount
@@ -169,12 +173,142 @@ function validateTour(input: RawTourRequest): string[] {
     // summary
     if (!input.summary) {
         errors.push('A tour must have a description')
+    } else if (input.summary.trim().length < 10) {
+        errors.push('A tour summary must have more or equal then 10 characters')
+    } else if (input.summary.trim().length > 500) {
+        errors.push(
+            'A tour summary must have less or equal then 500 characters',
+        )
     }
 
     // imageCover
     if (!input.imageCover) {
         errors.push('A tour must have a cover image')
+    } else if (input.imageCover.length < 1) {
+        errors.push('A tour must have a cover image')
+    } else if (input.imageCover.length > 1) {
+        errors.push('A tour must have only one cover image')
     }
+
+    // images
+    if (!input.images) {
+        errors.push('A tour must have images')
+    } else if (input.images.length < 3) {
+        errors.push('A tour must have at least 3 images')
+    } else if (input.images.length > 3) {
+        errors.push('A tour must have at most 3 images')
+    }
+    // startDates
+    if (!input.startDates || input.startDates.length === 0) {
+        errors.push('A tour must have at least one start date')
+    } else {
+        input.startDates.forEach((date) => {
+            if (!(date instanceof Date) || isNaN(date.getTime())) {
+                errors.push('A tour start date must be a valid date')
+            } else if (date < new Date()) {
+                errors.push('A tour start date must be in the future')
+            }
+        })
+    }
+    // guides
+    if (!input.guides || input.guides.length === 0) {
+        errors.push('A tour must have at least one guide')
+    } else {
+        input.guides.forEach((guide) => {
+            if (!guide || !guide._id) {
+                errors.push('A tour guide must be a valid user')
+            } else if (!guide.name || guide.name.trim().length < 3) {
+                errors.push(
+                    'A tour guide must have a name with at least 3 characters',
+                )
+            } else if (
+                !guide.role ||
+                !['lead-guide', 'guide'].includes(guide.role)
+            ) {
+                errors.push(
+                    'A tour guide must have a role of either "lead-guide" or "guide"',
+                )
+            }
+        })
+    }
+    // // startLocation
+    // if (!input.startLocation) {
+    //     errors.push('A tour must have a start location')
+    // } else {
+    //     if (!input.startLocation.description || input.startLocation.description.trim().length < 3) {
+    //         errors.push(
+    //             'A tour start location must have a description with at least 3 characters',
+    //         )
+    //     }
+    //     if (!input.startLocation.type || input.startLocation.type !== 'Point') {
+    //         errors.push(
+    //             'A tour start location must have a type of "Point"',
+    //         )
+    //     }
+    //     if (!input.startLocation.coordinates || input.startLocation.coordinates.length !== 2) {
+    //         errors.push(
+    //             'A tour start location must have coordinates with latitude and longitude',
+    //         )
+    //     } else {
+    //         const [longitude, latitude] = input.startLocation.coordinates
+    //         if (typeof longitude !== 'number' || typeof latitude !== 'number') {
+    //             errors.push(
+    //                 'A tour start location coordinates must be valid numbers',
+    //             )
+    //         } else if (longitude < -180 || longitude > 180) {
+    //             errors.push(
+    //                 'A tour start location longitude must be between -180 and 180',
+    //             )
+    //         } else if (latitude < -90 || latitude > 90) {
+    //             errors.push(
+    //                 'A tour start location latitude must be between -90 and 90',
+    //             )
+    //         }
+    //     }
+    // }
+    // // locations
+    // if (!input.locations || input.locations.length === 0) {
+    //     errors.push('A tour must have at least one location')
+    // } else {
+    //     input.locations.forEach((location) => {
+    //         if (!location.description || location.description.trim().length < 3) {
+    //             errors.push(
+    //                 'A tour location must have a description with at least 3 characters',
+    //             )
+    //         }
+    //         if (!location.type || location.type !== 'Point') {
+    //             errors.push(
+    //                 'A tour location must have a type of "Point"',
+    //             )
+    //         }
+    //         if (!location.coordinates || location.coordinates.length !== 2) {
+    //             errors.push(
+    //                 'A tour location must have coordinates with latitude and longitude',
+    //             )
+    //         } else {
+    //             const [longitude, latitude] = location.coordinates
+    //             if (typeof longitude !== 'number' || typeof latitude !== 'number') {
+    //                 errors.push(
+    //                     'A tour location coordinates must be valid numbers',
+    //                 )
+    //             } else if (longitude < -180 || longitude > 180) {
+    //                 errors.push(
+    //                     'A tour location longitude must be between -180 and 180',
+    //                 )
+    //             } else if (latitude < -90 || latitude > 90) {
+    //                 errors.push(
+    //                     'A tour location latitude must be between -90 and 90',
+    //                 )
+    //             }
+    //         }
+    //     })
+    // }
+
+    console.log({ input, errors })
+    // createdAt
+    // if (input.createdAt && !(input.createdAt instanceof Date)) {
+    //     errors.push('A tour createdAt must be a valid date')
+    // }
 
     return errors
 }
@@ -187,7 +321,12 @@ function reducer(state: typeof initialState, action: Action) {
 }
 
 const api = new ApiService()
-const createTour = async (rawTour: RawTourRequest) => {
+// const createTour = async (rawTour: RawTourRequest) => {
+//     const res = await api.post<Tour>('/tours', rawTour)
+//     return res
+// }
+
+const createTourFn = async (rawTour: RawTourRequest) => {
     const res = await api.post<Tour>('/tours', rawTour)
     return res
 }
@@ -202,9 +341,43 @@ const getGuideList = async (): Promise<User[]> => {
     return res.data
 }
 
+const CreateBtn: React.FC<{
+    tourReq: RawTourRequest
+    setTourError: React.Dispatch<React.SetStateAction<string[]>>
+    createTour: (tourReq: RawTourRequest) => void
+    isCreating: boolean
+    isTourError: boolean
+}> = ({ tourReq, setTourError, createTour, isCreating, isTourError }) => {
+    return (
+        <button
+            className={`${global.btn} ${global.btn__small} ${global.btn__green}`}
+            style={{ marginRight: 'auto' }}
+            onClick={withPreventDefault(() => {
+                const erros = validateTour(tourReq)
+                setTourError(erros)
+
+                // if (erros.length == 0) {
+                createTour(tourReq)
+                // }
+            })}
+        >
+            {isCreating ? (
+                <span className={global.loader}>Loading</span>
+            ) : isTourError ? (
+                <span className={global.error_message}>
+                    Error creating tour
+                </span>
+            ) : (
+                'Create Tour'
+            )}
+        </button>
+    )
+}
+
 const TourCreatorView: React.FC<Props> = (props) => {
     const [tourReq, dispatch] = useReducer(reducer, initialState)
     const [tourError, setTourError] = React.useState<string[]>([])
+    const [isReqError, setIsReqError] = React.useState<boolean>(false)
 
     const { data: guideUsersCached } = useQuery<User[]>({
         queryKey: ['guideUsers'],
@@ -220,6 +393,37 @@ const TourCreatorView: React.FC<Props> = (props) => {
         enabled: !!guideUsersCached,
     })
 
+    const {
+        mutate: createTour,
+        isPending: isCreating,
+        isError: isTourError,
+    } = useMutation({
+        mutationFn: createTourFn,
+        onSuccess: () => {
+            // Invalidate queries or refetch data if needed
+            console.log('Tour created successfully!')
+        },
+        onError: (error: unknown) => {
+            console.error('Failed to create tour:', error)
+        },
+    })
+
+    useEffect(() => {
+        if (isTourError) {
+            console.error('Error fetching guide users:', error)
+            setTourError((prev) => [
+                ...prev,
+                'Failed to fetch guide users, please try again later.',
+            ])
+
+            setIsReqError(true)
+
+            setTimeout(() => {
+                setIsReqError(false)
+            }, 3000)
+        }
+    }, [isTourError])
+
     return (
         <div className={styles.tourCreator}>
             <h2
@@ -227,7 +431,10 @@ const TourCreatorView: React.FC<Props> = (props) => {
             >
                 Tour Creator
             </h2>
-            <form action="" className={`${global.form}`}>
+            <form
+                action=""
+                className={`${global.form} ${styles.tourCreator__form}`}
+            >
                 <div className={styles.tourCreator__box}>
                     <TextInputBoxView
                         type="text"
@@ -379,41 +586,25 @@ const TourCreatorView: React.FC<Props> = (props) => {
                     />
 
                     {tourError.length > 0 && (
-                        <p className={global.error_message}>
+                        <ul className={styles.tourCreator__errors}>
                             {tourError.map((err) => (
-                                <span key={err}>{err}</span>
+                                <li className={global.error_message} key={err}>
+                                    <span key={err}>* {err}</span>
+                                </li>
                             ))}
-                        </p>
+                        </ul>
                     )}
 
-                    <CreateBtn tourReq={tourReq} setTourError={setTourError} />
+                    <CreateBtn
+                        tourReq={tourReq}
+                        setTourError={setTourError}
+                        createTour={createTour}
+                        isCreating={isCreating}
+                        isTourError={isReqError}
+                    />
                 </div>
             </form>
         </div>
-    )
-}
-
-const CreateBtn: React.FC<{
-    tourReq: RawTourRequest
-    setTourError: React.Dispatch<React.SetStateAction<string[]>>
-}> = ({ tourReq, setTourError }) => {
-    return (
-        <button
-            className={`${global.btn} ${global.btn__small} ${global.btn__green}`}
-            style={{ marginRight: 'auto' }}
-            onClick={withPreventDefault(() => {
-                const erros = validateTour(tourReq)
-                setTourError(erros)
-
-                if (erros.length == 0) {
-                    createTour(tourReq)
-
-                    console.log('erros: ', erros)
-                }
-            })}
-        >
-            Create Tour
-        </button>
     )
 }
 
